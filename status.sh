@@ -109,6 +109,3 @@ fi
 echo ""
 echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
-read -n 1 -s -r -p "tekan apasaja untuk kembali ke menu"
-
-menu
