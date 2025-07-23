@@ -130,10 +130,6 @@ echo -e "${GREEN}Done!${NC}"
 sleep 2
 clear
 
-# ✅ Set Zona Waktu
-ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
-timedatectl set-timezone Asia/Jakarta
-
 #rm -rf /usr/share/nginx/html/index.html
 #wget -q -O /usr/share/nginx/html/index.html "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/OTHERS/index.html"
 
