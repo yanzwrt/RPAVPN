@@ -46,7 +46,7 @@ echo -e "            ${WB}🧩 Multiport Websocket Autoscript by Rakha 🧩${NC}
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
 echo -e "                   ${WB}🖥️  Informasi Server 🖥️${NC}                 "
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
-echo -e "  ${RB}♦️${NC} ${YB}SISTEM    :$(hostnamectl | grep 'Operating System' | cut -d ' ' -f5-) ${NC}"
+echo -e "  ${RB}♦️${NC} ${YB}SISTEM    : $(hostnamectl | grep 'Operating System' | cut -d ' ' -f5-) ${NC}"
 echo -e "  ${RB}♦️${NC} ${YB}KERNEL    : $(uname -r) ${NC}"
 echo -e "  ${RB}♦️${NC} ${YB}UPTIME    : $uptime ${NC}"
 echo -e "  ${RB}♦️${NC} ${YB}CPU       : $load_cpu ${NC}"
