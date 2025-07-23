@@ -106,8 +106,8 @@ apt -y install wget curl
 # install netfilter-persistent
 apt-get install netfilter-persistent
 
-# set time GMT +8
-ln -fs /usr/share/zoneinfo/Asia/Kuala_Lumpur /etc/localtime
+# set time GMT +7
+ln -fs /usr/share/zoneinfo/Asia/Jakarta /etc/localtime
 
 # set locale
 sed -i 's/AcceptEnv/#AcceptEnv/g' /etc/ssh/sshd_config
@@ -244,7 +244,7 @@ chmod +x ram
 chmod +x dns
 chmod +x nf
 chmod +x limit
-echo "0 6 * * * root reboot" >> /etc/crontab
+echo "0 3 * * * root reboot" >> /etc/crontab
 echo "0 1 * * * root /usr/local/sbin/xp" >> /etc/crontab
 echo "0 2 * * * root /usr/bin/cleaner" >> /etc/crontab
 echo "0 5 * * * root backup" >> /etc/crontab
