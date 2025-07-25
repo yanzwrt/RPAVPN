@@ -59,9 +59,9 @@ hariini=$(date +"%Y-%m-%d")
 
 # Tambah ke config Xray
 sed -i '/#tls$/a\### '"$user $exp"'\
-},{"id": "'$uuid'","alterId": 0,"email": "'$user'"' /usr/local/etc/xray/config.json
+},{"id": "'$user'","alterId": 0,"email": "'$user'"' /usr/local/etc/xray/config.json
 sed -i '/#none$/a\### '"$user $exp"'\
-},{"id": "'$uuid'","alterId": 0,"email": "'$user'"' /usr/local/etc/xray/none.json
+},{"id": "'$user'","alterId": 0,"email": "'$user'"' /usr/local/etc/xray/none.json
 
 # Buat file konfigurasi vmess
 cat > /usr/local/etc/xray/$user-tls.json <<EOF
@@ -443,7 +443,7 @@ echo -e "${BB}══════════════════════
 echo -e "📄 YAML TLS         : http://${MYIP2}:81/$user-VMESSTLS.yaml"
 echo -e "📄 YAML Non-TLS     : http://${MYIP2}:81/$user-VMESSNTLS.yaml"
 echo -e "${BB}════════════════════════════════════════════════${NC}"
-echo -e "✨ Script oleh: RakhaVPN"
+echo -e "✨ Script mod by: RakhaVPN"
 echo ""
 read -p "$(echo -e "${YB}Tekan Enter untuk kembali ke menu ...${NC}")"
 menu
