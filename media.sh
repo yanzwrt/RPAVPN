@@ -287,7 +287,7 @@ fi
 echo ""
 echo -e "${Font_Green}Finished Test${Font_Suffix}"
 echo -e ""
-echo -e "Script Mod By NevermoreSSH"
+echo -e "Script Mod By RakhaVPN"
 echo ""
-read -p "$( echo -e "Tekan ${orange}[ ${NC}${Font_Green}Enter${Font_White} ${CYAN}]${Font_White} Kembali ke menu . . .") "
+read -p "$( echo -e "Tekan ${orange}[ ${NC}${Font_Green}Enter${Font_White} ${CYAN}]${Font_White} untuk kembali ke menu . . .") "
 menu
