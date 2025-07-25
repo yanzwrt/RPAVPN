@@ -29,7 +29,7 @@ until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${CLIENT_EXISTS} == '0' ]]; do
     echo -e "${WB}         Tambah Akun XRAY VMESS WS             ${NC}"
     echo -e "${BB}════════════════════════════════════════════════${NC}"
     
-    read -rp "➤ Masukkan Nama Pengguna : " -e user
+    read -rp "➤ Masukkan Nama Pengguna/Password : " -e user
     CLIENT_EXISTS=$(grep -w $user /usr/local/etc/xray/config.json | wc -l)
 
     if [[ ${CLIENT_EXISTS} == '1' ]]; then
@@ -70,7 +70,7 @@ cat > /usr/local/etc/xray/$user-tls.json <<EOF
   "ps": "XRAY_VMESS_TLS_${user}",
   "add": "${sts}${domain}",
   "port": "443",
-  "id": "${uuid}",
+  "id": "${user}",
   "aid": "0",
   "net": "ws",
   "path": "/vmess",
@@ -87,7 +87,7 @@ cat > /usr/local/etc/xray/$user-none.json <<EOF
   "ps": "XRAY_VMESS_NTLS_${user}",
   "add": "${sts}${domain}",
   "port": "80",
-  "id": "${uuid}",
+  "id": "${user}",
   "aid": "0",
   "net": "ws",
   "path": "/vmess",
@@ -241,7 +241,7 @@ proxies:
     server: ${sts}${domain}
     port: 443
     type: vmess
-    uuid: ${uuid}
+    uuid: ${user}
     alterId: 0
     cipher: auto
     tls: true
@@ -249,18 +249,18 @@ proxies:
     servername: ${sni}
     network: ws
     ws-opts:
-      path: /vmess-tls
+      path: /vmess
       headers:
         Host: ${domain}
     udp: true
 proxy-groups:
-  - name: NevermoreSSH-Autoscript
+  - name: RakhaVPN-Autoscript
     type: select
     proxies:
       - XRAY_VMESS_TLS_${user}
       - DIRECT
 rules:
-  - MATCH,NevermoreSSH-Autoscript
+  - MATCH,RakhaVPN-Autoscript
 EOF
 
 cat > /home/vps/public_html/$user-$exp-VMESSNTLS.yaml <<EOF
@@ -398,7 +398,7 @@ proxies:
     server: ${sts}${domain}
     port: 80
     type: vmess
-    uuid: ${uuid}
+    uuid: ${user}
     alterId: 0
     cipher: auto
     tls: false
@@ -406,18 +406,18 @@ proxies:
     servername: ${domain}
     network: ws
     ws-opts:
-      path: /vmess-ntls
+      path: /vmess
       headers:
         Host: ${domain}
     udp: true
 proxy-groups:
-  - name: NevermoreSSH-Autoscript
+  - name: RakhaVPN-Autoscript
     type: select
     proxies:
       - XRAY_VMESS_NTLS_${user}
       - DIRECT
 rules:
-  - MATCH,NevermoreSSH-Autoscript
+  - MATCH,RakhaVPN-Autoscript
 EOF
 # OUTPUT
 clear
@@ -426,10 +426,10 @@ echo -e "${WB}             Detail Akun XRAY VMESS WS          ${NC}"
 echo -e "${BB}════════════════════════════════════════════════${NC}"
 echo -e "📌 Username         : ${user}"
 echo -e "🌐 Domain           : ${domain}"
-echo -e "🔐 IP/Host          : ${MYIP}"
+#echo -e "🔐 IP/Host          : ${MYIP}"
 echo -e "🔒 Port TLS         : 443"
 echo -e "🔓 Port Non-TLS     : 80, 8080, 8880"
-echo -e "🆔 UUID             : ${uuid}"
+echo -e "🆔 UUID             : ${user}"
 echo -e "🔁 AlterId          : 0"
 echo -e "🔗 Path TLS         : /vmess"
 echo -e "🔗 Path Non-TLS     : /vmess"
