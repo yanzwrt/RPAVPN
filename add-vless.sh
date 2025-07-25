@@ -26,7 +26,7 @@ MYIP2=$(curl -sS ipv4.icanhazip.com)
 clear
 until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${CLIENT_EXISTS} == '0' ]]; do
     echo -e "${BB}════════════════════════════════════════════════${NC}"
-    echo -e "${WB}         Tambah Akun XRAY VLESS WS             ${NC}"
+    echo -e "${WB}      📡 Tambah Akun XRAY VLESS WS 📡          ${NC}"
     echo -e "${BB}════════════════════════════════════════════════${NC}"
     
     read -rp "➤ Masukkan Nama Pengguna : " -e user
