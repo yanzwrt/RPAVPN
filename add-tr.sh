@@ -27,9 +27,9 @@ MYIP2=$(curl -sS ipv4.icanhazip.com)
 clear
 until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${user_EXISTS} == '0' ]]; do
     echo -e "${BB}════════════════════════════════════════════════${NC}"
-    echo -e "${WB}         Tambah Akun XRAY TROJAN WS            ${NC}"
+    echo -e "${WB}      🛡️ Tambah Akun XRAY TROJAN WS 🛡️         ${NC}"
     echo -e "${BB}════════════════════════════════════════════════${NC}"
-    read -rp "➤ Masukkan Nama Pengguna : " -e user
+    read -rp "➤ Masukkan Nama Pengguna/Password : " -e user
     user_EXISTS=$(grep -w $user /usr/local/etc/xray/trojanws.json | wc -l)
     if [[ ${user_EXISTS} == '1' ]]; then
         echo -e "${RB}⚠️  Nama pengguna sudah terdaftar. Silakan gunakan nama lain.${NC}"
