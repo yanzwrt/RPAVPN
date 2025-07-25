@@ -26,7 +26,7 @@ WB='\e[37;1m' # Putih
 clear
 until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${CLIENT_EXISTS} == '0' ]]; do
     echo -e "${BB}════════════════════════════════════════════════${NC}"
-    echo -e "${WB}         Tambah Akun XRAY VMESS WS             ${NC}"
+    echo -e "${WB}      🌀 Tambah Akun XRAY VMESS WS 🌀          ${NC}"
     echo -e "${BB}════════════════════════════════════════════════${NC}"
     
     read -rp "➤ Masukkan Nama Pengguna/Password : " -e user
