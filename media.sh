@@ -27,12 +27,12 @@ function InstallJQ() {
         echo -e "${Font_Green}Installing dependencies: jq${Font_Suffix}";
         yum install jq -y -q > /dev/null;
     elif [[ $(cat /etc/os-release | grep '^ID=') =~ ubuntu ]] || [[ $(cat /etc/os-release | grep '^ID=') =~ debian ]];then
-        echo -e "${Font_Green}Updating package list...${Font_Suffix}";
+        echo -e "${Font_Green}Memperbarui daftar paket...${Font_Suffix}";
         apt-get update -y > /dev/null;
-        echo -e "${Font_Green}Installing dependencies: jq${Font_Suffix}";
+        echo -e "${Font_Green}Menginstal dependensi: jq${Font_Suffix}";
         apt-get install jq -y > /dev/null;
     else
-        echo -e "${Font_Red}Please install jq manually${Font_Suffix}";
+        echo -e "${Font_Red}Silakan instal jq secara manual${Font_Suffix}";
         exit;
     fi
 }
@@ -180,7 +180,7 @@ function MediaUnlockTest_YouTube() {
         return;
     fi
     
-    local result=$(echo $tmpresult | grep 'Premium is not available in your country')
+    local result=$(echo $tmpresult | grep 'Premium tidak tersedia di negara Anda')
     if [ -n "$result" ]; then
         echo -n -e "\r YouTube\t\t\t\t: ${Font_Red}No Premium${Font_Suffix}(Region: ${region})${Font_Suffix} \n"
         return;
@@ -272,7 +272,7 @@ if [[ "$check4" != *"unreachable"* ]] && [[ "$check4" != *"Unreachable"* ]];then
     startcheck "${1}" "4";
 else
     v4=""
-    echo -e "${Font_SkyBlue}The current host does not support IPV4, skip...${Font_Suffix}";
+    echo -e "${Font_SkyBlue}Host saat ini tidak mendukung IPV4, lewati...${Font_Suffix}";
 fi
 
 echo ""
@@ -282,10 +282,10 @@ if [[ "$check6" != *"unreachable"* ]] && [[ "$check6" != *"Unreachable"* ]];then
     v6="1"
 else
     v6=""
-    echo -e "${Font_SkyBlue}The current host does not support IPV6, skip...${Font_Suffix}";
+    echo -e "${Font_SkyBlue}Host saat ini tidak mendukung IPV6, lewati...${Font_Suffix}";
 fi
 echo ""
-echo -e "${Font_Green}Finished Test${Font_Suffix}"
+echo -e "${Font_Green}Tes Selesai${Font_Suffix}"
 echo -e ""
 echo -e "Script Mod By RakhaVPN"
 echo ""
