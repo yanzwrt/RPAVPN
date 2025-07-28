@@ -3,7 +3,7 @@
 # Quick Setup | Script Setup Manager
 # Edition : Stable Edition V1.0
 # Auther  : RakhaVPN
-# (C) Copyright 2022
+# (C) Copyright 2025
 # =========================================
 
 red='\e[1;31m'
@@ -68,15 +68,15 @@ echo -e "              ${green}XRAY VLESS - WEBSOCKET (WS)${NC}              "
 echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "➤ Username           : ${user}"
 echo -e "➤ Domain             : ${domain}"
-echo -e "➤ IP/Host            : ${MYIP}"
+#echo -e "➤ IP/Host            : ${MYIP}"
+echo -e "➤ Wildcard           : bug.com.${domain}"
 echo -e "➤ Port TLS           : 443"
 echo -e "➤ Port Non-TLS       : 80, 8080, 8880"
 echo -e "➤ UUID / ID          : ${user}"
 echo -e "➤ Security           : TLS / None"
 echo -e "➤ Enkripsi           : None"
 echo -e "➤ Protokol           : WebSocket (WS)"
-echo -e "➤ Path TLS           : /vless"
-echo -e "➤ Path Non-TLS       : /vless"
+echo -e "➤ Path TLS/non-TLS   : /vless"
 echo -e "➤ Multipath          : /yourpath"
 echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "➤ Dibuat             : ${hariini}"
