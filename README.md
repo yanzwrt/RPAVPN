@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <h2 align="center">
- XRAY Multiport Websocket Free By NevermoreSSH 
-<br> Support CustomPath / worryfree
+ XRAY Multiport Websocket By RakhaVPN 
+<br> Support CustomPath / worryfree ( Vless Only)
   
 <h2 align="center"> ♦️Supported Linux Distribution♦️</h2>
 <p align="center"><img src="https://d33wubrfki0l68.cloudfront.net/5911c43be3b1da526ed609e9c55783d9d0f6b066/9858b/assets/img/debian-ubuntu-hover.png"width="400"></p>
@@ -9,7 +9,7 @@
   
 <p align="center"><img src="https://img.shields.io/badge/Service-Multiport (XRAY)-white"></p>
 
-## ⚠️ PLEASE README ⚠️
+## ⚠️ HARAP DIBACA ⚠️
 <b>
 
 1. Your SSL/TLS encryption mode is Full
@@ -20,12 +20,12 @@
 </b>
 </b>
 
-♦️ For Debian 10 / 11 For First Time Installation (Update Repo) <br>
+♦️ untuk Debian 11 / 12 Untuk Instalasi Pertama Kali (Update Repo) <br>
  
   ```html
  apt update -y && apt upgrade -y && apt dist-upgrade -y && reboot
   ```
-  ♦️ For Ubuntu 18.04 For First Time Installation (Update Repo) <br>
+  ♦️ unuk Ubuntu 20.04 Untuk Instalasi Pertama Kali (Update Repo) <br>
   
   ```html
  apt-get update && apt-get upgrade -y && apt dist-upgrade -y && update-grub && reboot
