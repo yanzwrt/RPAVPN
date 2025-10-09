@@ -166,11 +166,11 @@ htop
 ;;
 23)
 clear
-wget -q -O /usr/bin/xraychanger "https://raw.githubusercontent.com/NevermoreSSH/Xcore-custompath/main/xraychanger.sh" && chmod +x /usr/bin/xraychanger && xraychanger
+wget -q -O /usr/bin/xraychanger "https://raw.githubusercontent.com/yanzwrt/Xcore-custompath/main/xraychanger.sh" && chmod +x /usr/bin/xraychanger && xraychanger
 ;;
 24)
 clear
-wget -q -O /usr/bin/swapram "https://raw.githubusercontent.com/NevermoreSSH/swapram/main/swapram.sh" && chmod +x /usr/bin/swapram && swapram
+wget -q -O /usr/bin/swapram "https://raw.githubusercontent.com/yanzwrt/swapram/main/swapram.sh" && chmod +x /usr/bin/swapram && swapram
 ;;
 25)
 clear
