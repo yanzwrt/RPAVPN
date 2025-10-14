@@ -44,7 +44,8 @@ wget -O /root/.config/rclone/rclone.conf "https://${Server_URL}/rclone.conf"
 
 # Instal wondershaper untuk limit bandwidth
 green "⚙️ Menginstal wondershaper untuk pengaturan bandwidth..."
-git clone https://github.com/MrMan21/wondershaper.git
+#git clone https://github.com/MrMan21/wondershaper.git
+git clone https://github.com/yanzwrt/wondershaper.git
 cd wondershaper
 make install
 cd
