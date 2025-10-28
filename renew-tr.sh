@@ -69,7 +69,7 @@ echo -e " 👤 Nama Client   : ${cyan}$user${NC}"
 echo -e " 📆 Berakhir Pada : ${cyan}$exp4${NC}"
 echo -e "${green}╚════════════════════════════════════════════════════╝${NC}"
 echo ""
-echo -e "🛠️  Script Mod By RPA-NET"
+echo -e "🛠️  Script Mod By Rakha-VPN"
 echo ""
 read -p "$(echo -e "Tekan ${orange}[ ${NC}${green}Enter${NC} ${orange}]${NC} untuk kembali ke menu...") "
 menu
