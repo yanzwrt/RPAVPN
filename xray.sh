@@ -267,6 +267,7 @@ cat > /usr/local/etc/xray/trojanws.json <<'END'
 END
 
 # TROJAN WS NON-TLS
+cat > /usr/local/etc/xray/trnone.json <<'END'
 {
   "log": {
     "access": "/var/log/xray/trnone-access.log",
