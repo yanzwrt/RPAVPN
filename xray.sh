@@ -1,4 +1,4 @@
-#!/bin/bash
+lalu ada xray.sh dan xray2.sh #!/bin/bash
 # =========================================
 # Quick Setup | Script Setup Manager
 # Edition : Stable Edition V1.0
@@ -10,7 +10,7 @@ green='\e[0;32m'
 purple='\e[0;35m'
 orange='\e[0;33m'
 NC='\e[0m'
-export Server_URL="raw.githubusercontent.com/yanzwrt/yourpath/main"
+export Server_URL="raw.githubusercontent.com/yanzwrt/RPAVPN/main"
 
 clear
 dateFromServer=$(curl -v --insecure --silent https://google.com/ 2>&1 | grep Date | sed -e 's/< Date: //')
@@ -59,7 +59,7 @@ apt -y install chrony
 timedatectl set-ntp true
 systemctl enable chronyd && systemctl restart chronyd
 systemctl enable chrony && systemctl restart chrony
-timedatectl set-timezone Asia/Kuala_Lumpur
+timedatectl set-timezone Asia/Jakarta
 chronyc sourcestats -v
 chronyc tracking -v
 date
@@ -77,7 +77,7 @@ mkdir -p /usr/local/etc/xray
 #latest_version="$(curl -s https://api.github.com/repos/XTLS/Xray-core/releases | grep tag_name | sed -E 's/.*"v(.*)".*/\1/' | head -n 1)"
 
 # Installation Xray Core
-#xraycore_link="https://github.com/XTLS/Xray-core/releases/download/v$latest_version/xray-linux-64.zip"
+#xraycore_link="https://github.com/NevermoreSSH/Xray-core/releases/download/v$latest_version/xray-linux-64.zip"
 
 # Unzip Xray Linux 64
 #cd `mktemp -d`
@@ -87,12 +87,12 @@ mkdir -p /usr/local/etc/xray
 #chmod +x /usr/local/bin/xray
 
 #Download XRAY Core Dharak
-wget -O /usr/local/bin/xray "https://raw.githubusercontent.com/yanzwrt/yourpath/main/xray.linux.64bit"
+wget -O /usr/local/bin/xray "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/xray.linux.64bit"
 chmod +x /usr/local/bin/xray
 
 # generate certificates
 mkdir /root/.acme.sh
-curl https://raw.githubusercontent.com/yanzwrt/yourpath/main/acme.sh -o /root/.acme.sh/acme.sh
+curl https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/acme.sh -o /root/.acme.sh/acme.sh
 chmod +x /root/.acme.sh/acme.sh
 /root/.acme.sh/acme.sh --upgrade --auto-upgrade
 /root/.acme.sh/acme.sh --set-default-ca --server letsencrypt
@@ -1221,4 +1221,4 @@ wget -O trial-xtr "https://${Server_URL}/trial-xtr.sh" && chmod +x trial-xtr
 # // OTHER FILES
 echo -e "[ ${green}INFO${NC} ] Downloading Others Files"
 sleep 1
-rm -r xray.sh
+rm -r xray2.sh
