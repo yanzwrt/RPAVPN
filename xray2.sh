@@ -106,91 +106,892 @@ mkdir -p /home/vps/public_html
 # set uuid
 uuid=$(cat /proc/sys/kernel/random/uuid)
 
-# VMESS TLS
+# // Installing VMESS-TLS
 cat> /usr/local/etc/xray/config.json << END
 {
-  "log": {"access": "/var/log/xray/access.log","error": "/var/log/xray/error.log","loglevel": "info"},
+  "log": {
+    "access": "/var/log/xray/access.log",
+    "error": "/var/log/xray/error.log",
+    "loglevel": "info"
+  },
   "inbounds": [
     {
       "port": 1311,
       "listen": "127.0.0.1",
       "protocol": "vmess",
-      "settings": {"clients":[{"id": "${uuid}","alterId":0,"level":0,"email":""}]},
+      "settings": {
+        "clients": [
+          {
+            "id": "${uuid}",
+            "alterId": 0,
+            "level": 0,
+            "email": ""
+#tls
+          }
+        ]
+      },
       "streamSettings": {
         "network": "ws",
-        "security": "tls",
-        "tlsSettings": {"serverName": "${domain}"},
-        "wsSettings": {"acceptProxyProtocol": true,"path": "/vmess"}
+        "security": "none",
+        "wsSettings":
+            {
+              "acceptProxyProtocol": true,
+              "path": "/vmess"
+            }
       }
     }
   ],
-  "outbounds":[{"protocol":"freedom","settings":{}},{"protocol":"blackhole","settings":{},"tag":"blocked"}]
+    "outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": {}
+    },
+    {
+      "protocol": "blackhole",
+      "settings": {},
+      "tag": "blocked"
+    }
+  ],
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "ip": [
+          "0.0.0.0/8",
+          "10.0.0.0/8",
+          "100.64.0.0/10",
+          "169.254.0.0/16",
+          "172.16.0.0/12",
+          "192.0.0.0/24",
+          "192.0.2.0/24",
+          "192.168.0.0/16",
+          "198.18.0.0/15",
+          "198.51.100.0/24",
+          "203.0.113.0/24",
+          "::1/128",
+          "fc00::/7",
+          "fe80::/10"
+        ],
+        "outboundTag": "blocked"
+      },
+      {
+        "inboundTag": [
+          "api"
+        ],
+        "outboundTag": "api",
+        "type": "field"
+      },
+      {
+        "type": "field",
+        "outboundTag": "blocked",
+        "protocol": [
+          "bittorrent"
+        ]
+      }
+    ]
+  },
+  "stats": {},
+  "api": {
+    "services": [
+      "StatsService"
+    ],
+    "tag": "api"
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "statsUserDownlink": true,
+        "statsUserUplink": true
+      }
+    },
+    "system": {
+      "statsInboundUplink": true,
+      "statsInboundDownlink": true
+    }
+  }
 }
 END
 
-# VMESS NON-TLS
+# // INSTALLING VMESS NON-TLS
 cat> /usr/local/etc/xray/none.json << END
 {
-  "log":{"access":"/var/log/xray/access.log","error":"/var/log/xray/error.log","loglevel":"info"},
-  "inbounds":[
-    {"listen":"127.0.0.1","port":23456,"protocol":"vmess","settings":{"clients":[{"id":"${uuid}","alterId":0,"email":""}],"decryption":"none"},"streamSettings":{"network":"ws","security":"none","wsSettings":{"path":"/vmess"}}}
+  "log": {
+    "access": "/var/log/xray/access.log",
+    "error": "/var/log/xray/error.log",
+    "loglevel": "info"
+  },
+  "inbounds": [
+    {
+      "listen": "127.0.0.1",
+      "port": 10085,
+      "protocol": "dokodemo-door",
+      "settings": {
+        "address": "127.0.0.1"
+      },
+      "tag": "api"
+    },
+    {
+     "listen": "127.0.0.1",
+     "port": "23456",
+      "protocol": "vmess",
+      "settings": {
+        "clients": [
+          {
+            "id": "${uuid}",
+            "alterId": 0,
+            "email": ""
+#none
+          }
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "ws",
+	"security": "none",
+        "wsSettings": {
+          "path": "/vmess",
+          "headers": {
+            "Host": ""
+          }
+         },
+        "quicSettings": {},
+        "sockopt": {
+          "mark": 0,
+          "tcpFastOpen": true
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls"
+        ]
+      }
+    }
   ],
-  "outbounds":[{"protocol":"freedom","settings":{}},{"protocol":"blackhole","settings":{},"tag":"blocked"}]
+"outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": {}
+    },
+    {
+      "protocol": "blackhole",
+      "settings": {},
+      "tag": "blocked"
+    }
+  ],
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "ip": [
+          "0.0.0.0/8",
+          "10.0.0.0/8",
+          "100.64.0.0/10",
+          "169.254.0.0/16",
+          "172.16.0.0/12",
+          "192.0.0.0/24",
+          "192.0.2.0/24",
+          "192.168.0.0/16",
+          "198.18.0.0/15",
+          "198.51.100.0/24",
+          "203.0.113.0/24",
+          "::1/128",
+          "fc00::/7",
+          "fe80::/10"
+        ],
+        "outboundTag": "blocked"
+      },
+      {
+        "inboundTag": [
+          "api"
+        ],
+        "outboundTag": "api",
+        "type": "field"
+      },
+      {
+        "type": "field",
+        "outboundTag": "blocked",
+        "protocol": [
+          "bittorrent"
+        ]
+      }
+    ]
+  },
+  "stats": {},
+  "api": {
+    "services": [
+      "StatsService"
+    ],
+    "tag": "api"
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "statsUserDownlink": true,
+        "statsUserUplink": true
+      }
+    },
+    "system": {
+      "statsInboundUplink": true,
+      "statsInboundDownlink": true,
+      "statsOutboundUplink" : true,
+      "statsOutboundDownlink" : true
+    }
+  }
 }
 END
 
-# VLESS TLS
+# // INSTALLING VLESS-TLS
 cat> /usr/local/etc/xray/vless.json << END
 {
-  "log":{"access":"/var/log/xray/access2.log","error":"/var/log/xray/error.log","loglevel":"info"},
-  "inbounds":[
-    {"port":1312,"listen":"127.0.0.1","protocol":"vless","settings":{"clients":[{"id":"${uuid}","level":0,"email":""}],"decryption":"none"},"streamSettings":{"network":"ws","security":"tls","tlsSettings":{"serverName":"${domain}"},"wsSettings":{"acceptProxyProtocol":true,"path":"/vless"}}}
+  "log": {
+    "access": "/var/log/xray/access2.log",
+    "error": "/var/log/xray/error.log",
+    "loglevel": "info"
+  },
+  "inbounds": [
+    {
+      "port": 1312,
+      "listen": "127.0.0.1",
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "${uuid}",
+            "level": 0,
+            "email": ""
+#tls
+          }
+        ],
+        "decryption": "none"
+      },
+	  "encryption": "none",
+      "streamSettings": {
+        "network": "ws",
+        "security": "none",
+        "wsSettings":
+            {
+              "acceptProxyProtocol": true,
+              "path": "/vless"
+            }
+      }
+    }
   ],
-  "outbounds":[{"protocol":"freedom","settings":{}},{"protocol":"blackhole","settings":{},"tag":"blocked"}]
+    "outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": {}
+    },
+    {
+      "protocol": "blackhole",
+      "settings": {},
+      "tag": "blocked"
+    }
+  ],
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "ip": [
+          "0.0.0.0/8",
+          "10.0.0.0/8",
+          "100.64.0.0/10",
+          "169.254.0.0/16",
+          "172.16.0.0/12",
+          "192.0.0.0/24",
+          "192.0.2.0/24",
+          "192.168.0.0/16",
+          "198.18.0.0/15",
+          "198.51.100.0/24",
+          "203.0.113.0/24",
+          "::1/128",
+          "fc00::/7",
+          "fe80::/10"
+        ],
+        "outboundTag": "blocked"
+      },
+      {
+        "inboundTag": [
+          "api"
+        ],
+        "outboundTag": "api",
+        "type": "field"
+      },
+      {
+        "type": "field",
+        "outboundTag": "blocked",
+        "protocol": [
+          "bittorrent"
+        ]
+      }
+    ]
+  },
+  "stats": {},
+  "api": {
+    "services": [
+      "StatsService"
+    ],
+    "tag": "api"
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "statsUserDownlink": true,
+        "statsUserUplink": true
+      }
+    },
+    "system": {
+      "statsInboundUplink": true,
+      "statsInboundDownlink": true
+    }
+  }
 }
 END
 
-# VLESS NON-TLS
+# // INSTALLING VLESS NON-TLS
 cat> /usr/local/etc/xray/vnone.json << END
 {
-  "log":{"access":"/var/log/xray/access2.log","error":"/var/log/xray/error.log","loglevel":"info"},
-  "inbounds":[{"listen":"127.0.0.1","port":14016,"protocol":"vless","settings":{"clients":[{"id":"${uuid}","level":0,"email":""}],"decryption":"none"},"streamSettings":{"network":"ws","security":"none","wsSettings":{"path":"/vless"}}}],
-  "outbounds":[{"protocol":"freedom","settings":{}},{"protocol":"blackhole","settings":{},"tag":"blocked"}]
+  "log": {
+    "access": "/var/log/xray/access2.log",
+    "error": "/var/log/xray/error.log",
+    "loglevel": "info"
+  },
+  "inbounds": [
+    {
+      "listen": "127.0.0.1",
+      "port": 10085,
+      "protocol": "dokodemo-door",
+      "settings": {
+        "address": "127.0.0.1"
+      },
+      "tag": "api"
+    },
+    {
+     "listen": "127.0.0.1",
+     "port": "14016",
+      "protocol": "vless",
+      "settings": {
+        "clients": [
+          {
+            "id": "${uuid}",
+            "level": 0,
+            "email": ""
+#none
+          }
+        ],
+        "decryption": "none"
+      },
+      "encryption": "none",
+      "streamSettings": {
+        "network": "ws",
+	"security": "none",
+        "wsSettings": {
+          "path": "/vless",
+          "headers": {
+            "Host": ""
+          }
+         },
+        "quicSettings": {},
+        "sockopt": {
+          "mark": 0,
+          "tcpFastOpen": true
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls"
+        ]
+      }
+    }
+  ],
+"outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": {}
+    },
+    {
+      "protocol": "blackhole",
+      "settings": {},
+      "tag": "blocked"
+    }
+  ],
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "ip": [
+          "0.0.0.0/8",
+          "10.0.0.0/8",
+          "100.64.0.0/10",
+          "169.254.0.0/16",
+          "172.16.0.0/12",
+          "192.0.0.0/24",
+          "192.0.2.0/24",
+          "192.168.0.0/16",
+          "198.18.0.0/15",
+          "198.51.100.0/24",
+          "203.0.113.0/24",
+          "::1/128",
+          "fc00::/7",
+          "fe80::/10"
+        ],
+        "outboundTag": "blocked"
+      },
+      {
+        "inboundTag": [
+          "api"
+        ],
+        "outboundTag": "api",
+        "type": "field"
+      },
+      {
+        "type": "field",
+        "outboundTag": "blocked",
+        "protocol": [
+          "bittorrent"
+        ]
+      }
+    ]
+  },
+  "stats": {},
+  "api": {
+    "services": [
+      "StatsService"
+    ],
+    "tag": "api"
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "statsUserDownlink": true,
+        "statsUserUplink": true
+      }
+    },
+    "system": {
+      "statsInboundUplink": true,
+      "statsInboundDownlink": true,
+      "statsOutboundUplink" : true,
+      "statsOutboundDownlink" : true
+    }
+  }
 }
 END
 
-# TROJAN WS TLS
 cat> /usr/local/etc/xray/trojanws.json << END
 {
-  "log":{"access":"/var/log/xray/access3.log","error":"/var/log/xray/error.log","loglevel":"info"},
-  "inbounds":[{"port":1313,"listen":"127.0.0.1","protocol":"trojan","settings":{"clients":[{"password":"${uuid}","level":0,"email":""}]},"streamSettings":{"network":"ws","security":"tls","tlsSettings":{"serverName":"${domain}"},"wsSettings":{"acceptProxyProtocol":true,"path":"/trojan"}}}],
-  "outbounds":[{"protocol":"freedom","settings":{}},{"protocol":"blackhole","settings":{},"tag":"blocked"}]
+  "log": {
+    "access": "/var/log/xray/access3.log",
+    "error": "/var/log/xray/error.log",
+    "loglevel": "info"
+  },
+  "inbounds": [
+    {
+      "port": 1313,
+      "listen": "127.0.0.1",
+      "protocol": "trojan",
+      "settings": {
+        "clients": [
+          {
+            "password": "${uuid}",
+            "level": 0,
+            "email": ""
+#tr
+          }
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "none",
+        "wsSettings":
+            {
+              "acceptProxyProtocol": true,
+              "path": "/trojan"
+            }
+      }
+    }
+  ],
+    "outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": {}
+    },
+    {
+      "protocol": "blackhole",
+      "settings": {},
+      "tag": "blocked"
+    }
+  ],
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "ip": [
+          "0.0.0.0/8",
+          "10.0.0.0/8",
+          "100.64.0.0/10",
+          "169.254.0.0/16",
+          "172.16.0.0/12",
+          "192.0.0.0/24",
+          "192.0.2.0/24",
+          "192.168.0.0/16",
+          "198.18.0.0/15",
+          "198.51.100.0/24",
+          "203.0.113.0/24",
+          "::1/128",
+          "fc00::/7",
+          "fe80::/10"
+        ],
+        "outboundTag": "blocked"
+      },
+      {
+        "inboundTag": [
+          "api"
+        ],
+        "outboundTag": "api",
+        "type": "field"
+      },
+      {
+        "type": "field",
+        "outboundTag": "blocked",
+        "protocol": [
+          "bittorrent"
+        ]
+      }
+    ]
+  },
+  "stats": {},
+  "api": {
+    "services": [
+      "StatsService"
+    ],
+    "tag": "api"
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "statsUserDownlink": true,
+        "statsUserUplink": true
+      }
+    },
+    "system": {
+      "statsInboundUplink": true,
+      "statsInboundDownlink": true
+    }
+  }
 }
 END
 
-# TROJAN WS NON-TLS
-cat> /usr/local/etc/xray/trnone.json << END
+# // INSTALLING TROJAN WS NONE TLS
+cat > /usr/local/etc/xray/trnone.json << END
 {
-  "log":{"access":"/var/log/xray/access3.log","error":"/var/log/xray/error.log","loglevel":"info"},
-  "inbounds":[{"listen":"127.0.0.1","port":25432,"protocol":"trojan","settings":{"clients":[{"password":"${uuid}","level":0,"email":""}],"decryption":"none"},"streamSettings":{"network":"ws","security":"none","wsSettings":{"path":"/trojan"}}}],
-  "outbounds":[{"protocol":"freedom","settings":{}},{"protocol":"blackhole","settings":{},"tag":"blocked"}]
+"log": {
+        "access": "/var/log/xray/access3.log",
+        "error": "/var/log/xray/error.log",
+        "loglevel": "info"
+    },
+  "inbounds": [
+    {
+      "listen": "127.0.0.1",
+      "port": 10085,
+      "protocol": "dokodemo-door",
+      "settings": {
+        "address": "127.0.0.1"
+      },
+      "tag": "api"
+    },
+    {
+      "listen": "127.0.0.1",
+      "port": "25432",
+      "protocol": "trojan",
+      "settings": {
+        "clients": [
+          {
+            "password": "${uuid}",
+            "level": 0,
+            "email": ""
+#trnone
+          }
+        ],
+        "decryption": "none"
+      },
+            "streamSettings": {
+              "network": "ws",
+              "security": "none",
+              "wsSettings": {
+                    "path": "/trojan",
+                    "headers": {
+                    "Host": ""
+                    }
+                }
+            }
+        }
+    ],
+"outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": {}
+    },
+    {
+      "protocol": "blackhole",
+      "settings": {},
+      "tag": "blocked"
+    }
+  ],
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "ip": [
+          "0.0.0.0/8",
+          "10.0.0.0/8",
+          "100.64.0.0/10",
+          "169.254.0.0/16",
+          "172.16.0.0/12",
+          "192.0.0.0/24",
+          "192.0.2.0/24",
+          "192.168.0.0/16",
+          "198.18.0.0/15",
+          "198.51.100.0/24",
+          "203.0.113.0/24",
+          "::1/128",
+          "fc00::/7",
+          "fe80::/10"
+        ],
+        "outboundTag": "blocked"
+      },
+      {
+        "inboundTag": [
+          "api"
+        ],
+        "outboundTag": "api",
+        "type": "field"
+      },
+      {
+        "type": "field",
+        "outboundTag": "blocked",
+        "protocol": [
+          "bittorrent"
+        ]
+      }
+    ]
+  },
+  "stats": {},
+  "api": {
+    "services": [
+      "StatsService"
+    ],
+    "tag": "api"
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "statsUserDownlink": true,
+        "statsUserUplink": true
+      }
+    },
+    "system": {
+      "statsInboundUplink": true,
+      "statsInboundDownlink": true,
+      "statsOutboundUplink" : true,
+      "statsOutboundDownlink" : true
+    }
+  }
 }
 END
 
-# TROJAN TCP XTLS
-cat> /usr/local/etc/xray/xtrojan.json << END
+# // INSTALLING TROJAN TCP
+cat > /usr/local/etc/xray/trojan.json << END
 {
-  "log":{"access":"/var/log/xray/access5.log","error":"/var/log/xray/error.log","loglevel":"info"},
-  "inbounds":[{"port":443,"protocol":"trojan","settings":{"clients":[{"id":"${uuid}","flow":"xtls-rprx-direct","level":0,"email":""}],"decryption":"none"},"streamSettings":{"network":"tcp","security":"xtls","xtlsSettings":{"minVersion":"1.2","alpn":["http/1.1","h2"],"certificates":[{"certificateFile":"/usr/local/etc/xray/xray.crt","keyFile":"/usr/local/etc/xray/xray.key"}]}}}]
+  "log": {
+    "access": "/var/log/xray/access4.log",
+    "error": "/var/log/xray/error.log",
+    "loglevel": "info"
+       },
+    "inbounds": [
+        {
+            "port": 1310,
+            "listen": "127.0.0.1",
+            "protocol": "trojan",
+            "settings": {
+                "clients": [
+                    {
+                        "id": "${uuid}",
+                        "password": "xxxxx"
+#tr
+                    }
+                ],
+                "fallbacks": [
+                    {
+                        "dest": 80
+                    }
+                ]
+            },
+            "streamSettings": {
+                "network": "tcp",
+                "security": "none",
+                "tcpSettings": {
+                    "acceptProxyProtocol": true
+                }
+            }
+        }
+    ],
+    "outbounds": [
+    {
+      "protocol": "freedom",
+      "settings": {}
+    },
+    {
+      "protocol": "blackhole",
+      "settings": {},
+      "tag": "blocked"
+    }
+  ],
+  "routing": {
+    "rules": [
+      {
+        "type": "field",
+        "ip": [
+          "0.0.0.0/8",
+          "10.0.0.0/8",
+          "100.64.0.0/10",
+          "169.254.0.0/16",
+          "172.16.0.0/12",
+          "192.0.0.0/24",
+          "192.0.2.0/24",
+          "192.168.0.0/16",
+          "198.18.0.0/15",
+          "198.51.100.0/24",
+          "203.0.113.0/24",
+          "::1/128",
+          "fc00::/7",
+          "fe80::/10"
+        ],
+        "outboundTag": "blocked"
+      },
+      {
+        "inboundTag": [
+          "api"
+        ],
+        "outboundTag": "api",
+        "type": "field"
+      },
+      {
+        "type": "field",
+        "outboundTag": "blocked",
+        "protocol": [
+          "bittorrent"
+        ]
+      }
+    ]
+  },
+  "stats": {},
+  "api": {
+    "services": [
+      "StatsService"
+    ],
+    "tag": "api"
+  },
+  "policy": {
+    "levels": {
+      "0": {
+        "statsUserDownlink": true,
+        "statsUserUplink": true
+      }
+    },
+    "system": {
+      "statsInboundUplink": true,
+      "statsInboundDownlink": true,
+      "statsOutboundUplink" : true,
+      "statsOutboundDownlink" : true
+    }
+  }
 }
 END
 
-# TROJAN TCP
-cat> /usr/local/etc/xray/trojan.json << END
+# // INSTALLING TROJAN TCP XTLS
+cat > /usr/local/etc/xray/xtrojan.json << END
 {
-  "log":{"access":"/var/log/xray/access4.log","error":"/var/log/xray/error.log","loglevel":"info"},
-  "inbounds":[{"port":1310,"listen":"127.0.0.1","protocol":"trojan","settings":{"clients":[{"id":"${uuid}","password":"xxxxx"}]},"streamSettings":{"network":"tcp","security":"none","tcpSettings":{"acceptProxyProtocol":true}}}],
-  "outbounds":[{"protocol":"freedom","settings":{}},{"protocol":"blackhole","settings":{},"tag":"blocked"}]
+    "log": {
+        "access": "/var/log/xray/access5.log",
+        "error": "/var/log/xray/error.log",
+        "loglevel": "info"
+  },
+  "inbounds": [
+    {
+      "port": 443,
+      "protocol": "trojan",
+      "settings": {
+        "clients": [
+          {
+            "id": "${uuid}",
+            "flow": "xtls-rprx-direct",
+            "level": 0,
+            "email": ""
+#trojan-xtls
+          }
+        ],
+        "decryption": "none",
+        "fallbacks": [
+                    {
+                        "dest": 1310,
+                        "xver": 1
+                    },
+                    {
+                        "alpn": "h2",
+                        "dest": 1318,
+                        "xver": 1
+                    },
+                    {
+                        "path": "/vmess",
+                        "dest": 1311,
+                        "xver": 1
+                    },
+                    {
+                        "path": "/vless",
+                        "dest": 1312,
+                        "xver": 1
+                    },
+                    {
+                        "path": "/trojan",
+                        "dest": 1313,
+                        "xver": 1
+                    }
+        ]
+      },
+      "streamSettings": {
+        "network": "tcp",
+        "security": "xtls",
+        "xtlsSettings": {
+          "minVersion": "1.2",
+		  "alpn": [
+			"http/1.1",
+			"h2"
+		  ],
+          "certificates": [
+            {
+                    "certificateFile": "/usr/local/etc/xray/xray.crt",
+                    "keyFile": "/usr/local/etc/xray/xray.key"
+            }
+          ]
+        }
+      },
+      "sniffing": {
+        "enabled": true,
+        "destOverride": [
+          "http",
+          "tls"
+        ]
+      }
+    }
+  ],
+  "outbounds": [
+    {
+      "protocol": "freedom"
+    }
+  ]
 }
 END
 
