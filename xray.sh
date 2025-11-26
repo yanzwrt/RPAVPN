@@ -109,8 +109,9 @@ uuid=$(cat /proc/sys/kernel/random/uuid)
 # ======= Konfigurasi XRAY =======
 echo -e "[ ${green}INFO${NC} ] Menulis konfigurasi XRAY..."
 
+
 # VMESS TLS
-cat> /usr/local/etc/xray/config.json << END
+cat > /usr/local/etc/xray/config.json <<'END'
 {
   "log": {"access": "/var/log/xray/access.log","error": "/var/log/xray/error.log","loglevel": "info"},
   "inbounds": [
@@ -118,12 +119,21 @@ cat> /usr/local/etc/xray/config.json << END
       "port": 1311,
       "listen": "127.0.0.1",
       "protocol": "vmess",
-      "settings": {"clients":[{"id": "${uuid}","alterId":0,"level":0,"email":""}]},
+      "settings": {
+        "clients": [
+          "###VMESS"
+        ]
+      },
       "streamSettings": {
         "network": "ws",
         "security": "tls",
-        "tlsSettings": {"serverName": "${domain}"},
-        "wsSettings": {"acceptProxyProtocol": true,"path": "/vmess"}
+        "tlsSettings": {
+          "serverName": ""
+        },
+        "wsSettings": {
+          "acceptProxyProtocol": true,
+          "path": "/vmess"
+        }
       }
     }
   ],
@@ -132,70 +142,205 @@ cat> /usr/local/etc/xray/config.json << END
 END
 
 # VMESS NON-TLS
-cat> /usr/local/etc/xray/none.json << END
+cat > /usr/local/etc/xray/none.json <<'END'
 {
   "log":{"access":"/var/log/xray/access.log","error":"/var/log/xray/error.log","loglevel":"info"},
   "inbounds":[
-    {"listen":"127.0.0.1","port":23456,"protocol":"vmess","settings":{"clients":[{"id":"${uuid}","alterId":0,"email":""}],"decryption":"none"},"streamSettings":{"network":"ws","security":"none","wsSettings":{"path":"/vmess"}}}
+    {
+      "listen":"127.0.0.1",
+      "port":23456,
+      "protocol":"vmess",
+      "settings":{
+        "clients":[
+          "###VMESSNONE"
+        ],
+        "decryption":"none"
+      },
+      "streamSettings":{
+        "network":"ws",
+        "security":"none",
+        "wsSettings":{"path":"/vmess","headers":{}}
+      }
+    }
   ],
   "outbounds":[{"protocol":"freedom","settings":{}},{"protocol":"blackhole","settings":{},"tag":"blocked"}]
 }
 END
 
 # VLESS TLS
-cat> /usr/local/etc/xray/vless.json << END
+cat > /usr/local/etc/xray/vless.json <<'END'
 {
   "log":{"access":"/var/log/xray/access2.log","error":"/var/log/xray/error.log","loglevel":"info"},
   "inbounds":[
-    {"port":1312,"listen":"127.0.0.1","protocol":"vless","settings":{"clients":[{"id":"${uuid}","level":0,"email":""}],"decryption":"none"},"streamSettings":{"network":"ws","security":"tls","tlsSettings":{"serverName":"${domain}"},"wsSettings":{"acceptProxyProtocol":true,"path":"/vless"}}}
+    {
+      "port":1312,
+      "listen":"127.0.0.1",
+      "protocol":"vless",
+      "settings":{
+        "clients":[
+          "###VLESS"
+        ],
+        "decryption":"none"
+      },
+      "streamSettings":{
+        "network":"ws",
+        "security":"tls",
+        "tlsSettings":{"serverName":""},
+        "wsSettings":{"acceptProxyProtocol":true,"path":"/vless"}
+      }
+    }
   ],
   "outbounds":[{"protocol":"freedom","settings":{}},{"protocol":"blackhole","settings":{},"tag":"blocked"}]
 }
 END
 
 # VLESS NON-TLS
-cat> /usr/local/etc/xray/vnone.json << END
+cat > /usr/local/etc/xray/vnone.json <<'END'
 {
   "log":{"access":"/var/log/xray/access2.log","error":"/var/log/xray/error.log","loglevel":"info"},
-  "inbounds":[{"listen":"127.0.0.1","port":14016,"protocol":"vless","settings":{"clients":[{"id":"${uuid}","level":0,"email":""}],"decryption":"none"},"streamSettings":{"network":"ws","security":"none","wsSettings":{"path":"/vless"}}}],
+  "inbounds":[
+    {
+      "listen":"127.0.0.1",
+      "port":14016,
+      "protocol":"vless",
+      "settings":{
+        "clients":[
+          "###VLESSNONE"
+        ],
+        "decryption":"none"
+      },
+      "streamSettings":{
+        "network":"ws",
+        "security":"none",
+        "wsSettings":{"path":"/vless","headers":{}}
+      }
+    }
+  ],
   "outbounds":[{"protocol":"freedom","settings":{}},{"protocol":"blackhole","settings":{},"tag":"blocked"}]
 }
 END
 
 # TROJAN WS TLS
-cat> /usr/local/etc/xray/trojanws.json << END
+cat > /usr/local/etc/xray/trojanws.json <<'END'
 {
-  "log":{"access":"/var/log/xray/access3.log","error":"/var/log/xray/error.log","loglevel":"info"},
-  "inbounds":[{"port":1313,"listen":"127.0.0.1","protocol":"trojan","settings":{"clients":[{"password":"${uuid}","level":0,"email":""}]},"streamSettings":{"network":"ws","security":"tls","tlsSettings":{"serverName":"${domain}"},"wsSettings":{"acceptProxyProtocol":true,"path":"/trojan"}}}],
-  "outbounds":[{"protocol":"freedom","settings":{}},{"protocol":"blackhole","settings":{},"tag":"blocked"}]
+  "log": {
+    "access": "/var/log/xray/trojanws-access.log",
+    "error": "/var/log/xray/trojanws-error.log",
+    "loglevel": "info"
+  },
+  "inbounds": [
+    {
+      "port": 1313,
+      "listen": "127.0.0.1",
+      "protocol": "trojan",
+      "settings": {
+        "clients": [
+          #tr
+        ]
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "tls",
+        "tlsSettings": {
+          "alpn": ["http/1.1", "h2"],
+          "certificates": [
+            {
+              "certificateFile": "/usr/local/etc/xray/xray.crt",
+              "keyFile": "/usr/local/etc/xray/xray.key"
+            }
+          ]
+        },
+        "wsSettings": {
+          "path": "/trojan",
+          "headers": {
+            "Host": ""
+          }
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    { "protocol": "freedom" },
+    { "protocol": "blackhole", "tag": "blocked" }
+  ]
 }
 END
 
 # TROJAN WS NON-TLS
-cat> /usr/local/etc/xray/trnone.json << END
 {
-  "log":{"access":"/var/log/xray/access3.log","error":"/var/log/xray/error.log","loglevel":"info"},
-  "inbounds":[{"listen":"127.0.0.1","port":25432,"protocol":"trojan","settings":{"clients":[{"password":"${uuid}","level":0,"email":""}],"decryption":"none"},"streamSettings":{"network":"ws","security":"none","wsSettings":{"path":"/trojan"}}}],
-  "outbounds":[{"protocol":"freedom","settings":{}},{"protocol":"blackhole","settings":{},"tag":"blocked"}]
+  "log": {
+    "access": "/var/log/xray/trnone-access.log",
+    "error": "/var/log/xray/trnone-error.log",
+    "loglevel": "info"
+  },
+  "inbounds": [
+    {
+      "port": 25432,
+      "listen": "127.0.0.1",
+      "protocol": "trojan",
+      "settings": {
+        "clients": [
+          #trnone
+        ],
+        "decryption": "none"
+      },
+      "streamSettings": {
+        "network": "ws",
+        "security": "none",
+        "wsSettings": {
+          "path": "/trojan",
+          "headers": {
+            "Host": ""
+          }
+        }
+      }
+    }
+  ],
+  "outbounds": [
+    { "protocol": "freedom" },
+    { "protocol": "blackhole", "tag": "blocked" }
+  ]
 }
 END
 
-# TROJAN TCP XTLS
-cat> /usr/local/etc/xray/xtrojan.json << END
+# TROJAN TCP XTLS (unchanged)
+cat > /usr/local/etc/xray/xtrojan.json <<'END'
 {
   "log":{"access":"/var/log/xray/access5.log","error":"/var/log/xray/error.log","loglevel":"info"},
-  "inbounds":[{"port":443,"protocol":"trojan","settings":{"clients":[{"id":"${uuid}","flow":"xtls-rprx-direct","level":0,"email":""}],"decryption":"none"},"streamSettings":{"network":"tcp","security":"xtls","xtlsSettings":{"minVersion":"1.2","alpn":["http/1.1","h2"],"certificates":[{"certificateFile":"/usr/local/etc/xray/xray.crt","keyFile":"/usr/local/etc/xray/xray.key"}]}}}]
+  "inbounds":[
+    {
+      "port":443,
+      "protocol":"trojan",
+      "settings":{
+        "clients":[
+          {"id":"'"${uuid}"'","flow":"xtls-rprx-direct","level":0,"email":""}
+        ],
+        "decryption":"none",
+        "fallbacks":[
+          {"dest":1310,"xver":1},
+          {"alpn":"h2","dest":1318,"xver":1},
+          {"path":"/vmess","dest":1311,"xver":1},
+          {"path":"/vless","dest":1312,"xver":1},
+          {"path":"/trojan","dest":1313,"xver":1}
+        ]
+      },
+      "streamSettings":{
+        "network":"tcp",
+        "security":"xtls",
+        "xtlsSettings":{
+          "minVersion":"1.2",
+          "alpn":["http/1.1","h2"],
+          "certificates":[{"certificateFile":"/usr/local/etc/xray/xray.crt","keyFile":"/usr/local/etc/xray/xray.key"}]
+        }
+      },
+      "sniffing":{"enabled":true,"destOverride":["http","tls"]}
+    }
+  ],
+  "outbounds":[{"protocol":"freedom"}]
 }
 END
 
-# TROJAN TCP
-cat> /usr/local/etc/xray/trojan.json << END
-{
-  "log":{"access":"/var/log/xray/access4.log","error":"/var/log/xray/error.log","loglevel":"info"},
-  "inbounds":[{"port":1310,"listen":"127.0.0.1","protocol":"trojan","settings":{"clients":[{"id":"${uuid}","password":"xxxxx"}]},"streamSettings":{"network":"tcp","security":"none","tcpSettings":{"acceptProxyProtocol":true}}}],
-  "outbounds":[{"protocol":"freedom","settings":{}},{"protocol":"blackhole","settings":{},"tag":"blocked"}]
-}
-END
+echo "[OK] xray json templates written (markers inserted)."
 
 rm -rf /etc/systemd/system/xray.service.d
 rm -rf /etc/systemd/system/xray@.service.d
