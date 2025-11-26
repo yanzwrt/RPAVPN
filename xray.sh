@@ -10,7 +10,7 @@ green='\e[0;32m'
 purple='\e[0;35m'
 orange='\e[0;33m'
 NC='\e[0m'
-export Server_URL="raw.githubusercontent.com/yanzwrt/RPAVPN/main"
+export Server_URL="raw.githubusercontent.com/yanzwrt/yourpath/main"
 
 clear
 dateFromServer=$(curl -v --insecure --silent https://google.com/ 2>&1 | grep Date | sed -e 's/< Date: //')
@@ -59,7 +59,7 @@ apt -y install chrony
 timedatectl set-ntp true
 systemctl enable chronyd && systemctl restart chronyd
 systemctl enable chrony && systemctl restart chrony
-timedatectl set-timezone Asia/Jakarta
+timedatectl set-timezone Asia/Kuala_Lumpur
 chronyc sourcestats -v
 chronyc tracking -v
 date
@@ -87,12 +87,12 @@ mkdir -p /usr/local/etc/xray
 #chmod +x /usr/local/bin/xray
 
 #Download XRAY Core Dharak
-wget -O /usr/local/bin/xray "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/xray.linux.64bit"
+wget -O /usr/local/bin/xray "https://raw.githubusercontent.com/yanzwrt/yourpath/main/xray.linux.64bit"
 chmod +x /usr/local/bin/xray
 
 # generate certificates
 mkdir /root/.acme.sh
-curl https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/acme.sh -o /root/.acme.sh/acme.sh
+curl https://raw.githubusercontent.com/yanzwrt/yourpath/main/acme.sh -o /root/.acme.sh/acme.sh
 chmod +x /root/.acme.sh/acme.sh
 /root/.acme.sh/acme.sh --upgrade --auto-upgrade
 /root/.acme.sh/acme.sh --set-default-ca --server letsencrypt
