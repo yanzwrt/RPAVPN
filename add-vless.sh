@@ -26,10 +26,10 @@ MYIP2=$(curl -sS ipv4.icanhazip.com)
 clear
 until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${CLIENT_EXISTS} == '0' ]]; do
     echo -e "${BB}════════════════════════════════════════════════${NC}"
-    echo -e "${WB}      📡 Tambah Akun XRAY VLESS WS 📡          ${NC}"
+    echo -e "${WB}         Tambah Akun XRAY VLESS WS             ${NC}"
     echo -e "${BB}════════════════════════════════════════════════${NC}"
     
-    read -rp "➤ Masukkan Nama Pengguna/Password : " -e user
+    read -rp "➤ Masukkan Nama Pengguna : " -e user
     CLIENT_EXISTS=$(grep -w $user /usr/local/etc/xray/vless.json | wc -l)
 
     if [[ ${CLIENT_EXISTS} == '1' ]]; then
@@ -60,9 +60,9 @@ hariini=$(date +"%Y-%m-%d")
 
 # TAMBAH KE KONFIGURASI XRAY
 sed -i '/#tls$/a\### '"$user $exp"'\
-},{"id": "'$user'","email": "'$user'"' /usr/local/etc/xray/vless.json
+},{"id": "'$uuid'","email": "'$user'"' /usr/local/etc/xray/vless.json
 sed -i '/#none$/a\### '"$user $exp"'\
-},{"id": "'$user'","email": "'$user'"' /usr/local/etc/xray/vnone.json
+},{"id": "'$uuid'","email": "'$user'"' /usr/local/etc/xray/vnone.json
 
 # RESTART XRAY
 systemctl restart xray@vless.service
@@ -70,8 +70,8 @@ systemctl restart xray@vnone.service
 service cron restart
 
 # LINK
-vlesslink1="vless://${user}@${sts}${domain}:443?type=ws&encryption=none&security=tls&host=${domain}&path=/vless&allowInsecure=1&sni=${sni}#XRAY_VLESS_TLS_${user}"
-vlesslink2="vless://${user}@${sts}${domain}:80?type=ws&encryption=none&security=none&host=${domain}&path=/vless#XRAY_VLESS_NTLS_${user}"
+vlesslink1="vless://${uuid}@${sts}${domain}:443?type=ws&encryption=none&security=tls&host=${domain}&path=/vless&allowInsecure=1&sni=${sni}#XRAY_VLESS_TLS_${user}"
+vlesslink2="vless://${uuid}@${sts}${domain}:80?type=ws&encryption=none&security=none&host=${domain}&path=/vless#XRAY_VLESS_NTLS_${user}"
 
 cat > /home/vps/public_html/$user-$exp-VLESSTLS.yaml <<EOF
 port: 7890
@@ -392,14 +392,14 @@ echo -e "${WB}             Detail Akun XRAY VLESS WS          ${NC}"
 echo -e "${BB}════════════════════════════════════════════════${NC}"
 echo -e "📌 Username         : ${user}"
 echo -e "🌐 Domain           : ${domain}"
-echo -e "📡 Wildcard         : bug.com.${domain}"
-#echo -e "🔐 IP/Host         : ${MYIP}"
+echo -e "🔐 IP/Host          : ${MYIP}"
 echo -e "🔒 Port TLS         : 443"
 echo -e "🔓 Port Non-TLS     : 80, 8080, 8880"
-echo -e "🆔 UUID             : ${user}"
-#echo -e "🔒 Security        : tls"
-echo -e "🔁 Network          : ws"
-echo -e "📄 Path TLS-NTLS    : /vless"
+echo -e "🆔 UUID             : ${uuid}"
+echo -e "🔒 Security         : TLS"
+echo -e "🔁 Network          : WS"
+echo -e "📄 Path TLS         : /vless"
+echo -e "📄 Path Non-TLS     : /vless"
 echo -e "🧩 Multipath        : /yourpath"
 echo -e "📆 Tanggal Dibuat   : ${hariini}"
 echo -e "⏳ Berakhir Pada    : ${exp}"
