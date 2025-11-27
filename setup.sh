@@ -2,10 +2,13 @@
 # =========================================
 # Quick Setup | Script Setup Manager
 # Edition : Stable Edition V1.0
-# Auther  : yanzwrt
+# Author  : yanzwrt
 # (C) Copyright 2025
 # =========================================
+
 clear
+
+# Warna
 DEFBOLD='\e[39;1m'
 RB='\e[31;1m'
 GB='\e[32;1m'
@@ -18,136 +21,165 @@ red='\e[1;31m'
 green='\e[0;32m'
 purple='\e[0;35m'
 orange='\e[0;33m'
+CYAN='\e[0;36m'
 NC='\e[0m'
+
+# URL repo
 export Server_URL="raw.githubusercontent.com/yanzwrt/RPAVPN/main"
+
+# Ambil tanggal dari server Google
 dateFromServer=$(curl -v --insecure --silent https://google.com/ 2>&1 | grep Date | sed -e 's/< Date: //')
-biji=`date +"%Y-%m-%d" -d "$dateFromServer"`
-##########################
-MYIP=$(wget -qO- ipv4.icanhazip.com);
-MYIP=$(curl -s ipinfo.io/ip )
-MYIP=$(curl -sS ipv4.icanhazip.com)
-MYIP=$(curl -sS ifconfig.me )
-echo "Checking VPS"
+biji=$(date +"%Y-%m-%d" -d "$dateFromServer")
+
+# IP VPS (pakai satu saja, yang stabil)
+MYIP=$(curl -sS ifconfig.me)
+
+echo "Checking VPS..."
+sleep 1
 clear
-red='\e[1;31m'
-green='\e[0;32m'
-yell='\e[1;33m'
-tyblue='\e[1;36m'
-purple='\e[0;35m'
-NC='\e[0m'
-purple() { echo -e "\\033[35;1m${*}\\033[0m"; }
-tyblue() { echo -e "\\033[36;1m${*}\\033[0m"; }
-yellow() { echo -e "\\033[33;1m${*}\\033[0m"; }
-green() { echo -e "\\033[32;1m${*}\\033[0m"; }
-red() { echo -e "\\033[31;1m${*}\\033[0m"; }
 
-
-red='\e[1;31m'
-green='\e[0;32m'
-NC='\e[0m'
-green() { echo -e "\\033[32;1m${*}\\033[0m"; }
-red() { echo -e "\\033[31;1m${*}\\033[0m"; }
-
+# Cek harus root
 if [ "${EUID}" -ne 0 ]; then
-		echo "Anda perlu menjalankan skrip ini sebaga root"
-		exit 1
+  echo "Anda perlu menjalankan skrip ini sebagai root"
+  exit 1
 fi
+
+# Cek OpenVZ
 if [ "$(systemd-detect-virt)" == "openvz" ]; then
-		echo "OpenVZ tidak didukung"
-		exit 1
+  echo "OpenVZ tidak didukung"
+  exit 1
 fi
-MYIP=$(wget -qO- icanhazip.com/ip);
+
+# Fungsi durasi instalasi
 secs_to_human() {
-    echo "Waktu instalasi : $(( ${1} / 3600 )) hours $(( (${1} / 60) % 60 )) minutes $(( ${1} % 60 )) seconds"
+  echo "Waktu instalasi : $(( ${1} / 3600 )) jam $(( (${1} / 60) % 60 )) menit $(( ${1} % 60 )) detik"
 }
+
 start=$(date +%s)
 
 echo -e "[ ${green}INFO${NC} ] Mempersiapkan instalasi autoscript ~"
 apt install git curl -y >/dev/null 2>&1
-echo -e "[ ${green}INFO${NC} ] File instalasi siap untuk dimulai !"
+echo -e "[ ${green}INFO${NC} ] File instalasi siap untuk dimulai!"
 sleep 1
 
-if [ -f "/usr/local/etc/xray/domain" ]; then
-echo "Skrip Sudah Terpasang"
-exit 0
+# Cek apakah sudah pernah diinstall (pakai config Xray & domain)
+if [ -f "/usr/local/etc/xray/config.json" ] && [ -f "/root/domain" ]; then
+  echo "Skrip sudah terpasang. Jika ingin install ulang, hapus /usr/local/etc/xray dan /root/domain dulu."
+  exit 0
 fi
 
-mkdir /var/lib/premium-script;
-mkdir /var/lib/crot-script;
-clear
-#echo -e "${red}♦️${NC} ${green}Established By yanzwrt 2025${NC} ${red}♦️${NC}"
-#DOWNLOAD SOURCE SCRIPT
-echo -e "${red}    ♦️${NC} ${green} PENYIAPAN DOMAIN VPS     ${NC}"
-echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-echo "1. Gunakan Domain Dari Script"
-echo "2. Pilih Domain Sendiri"
-echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-read -rp "Pilih Instalasi Domain Anda : " dom 
+# Direktori data
+mkdir -p /var/lib/premium-script
+mkdir -p /var/lib/crot-script
 
-if test $dom -eq 1; then
 clear
-wget -q -O /root/cf.sh "https://${Server_URL}/cf.sh"
-chmod +x /root/cf.sh
-./cf.sh
-elif test $dom -eq 2; then
-read -rp "Masukkan Domain Anda : " domen 
-echo $domen > /root/domain
-else 
-echo "Argumen Tidak Ditemukan"
-exit 1
-fi
-echo -e "${GREEN}Done!${NC}"
-sleep 2
+echo -e "${red}    ♦️${NC} ${green}PENYIAPAN DOMAIN VPS${NC}"
+echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
+echo "1. Gunakan Domain Dari Script (Cloudflare API di cf.sh)"
+echo "2. Masukkan Domain Sendiri (sudah kamu pointing ke IP VPS)"
+echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
+read -rp "Pilih Instalasi Domain Anda [1/2] : " dom
+
+host=""
+
+case "$dom" in
+  1)
+    clear
+    wget -q -O /root/cf.sh "https://${Server_URL}/cf.sh"
+    chmod +x /root/cf.sh
+    /root/cf.sh
+    # cf.sh seharusnya menulis domain ke /root/domain
+    if [ -f /root/domain ]; then
+      host=$(cat /root/domain)
+    else
+      echo "Gagal mendapatkan domain dari cf.sh"
+      exit 1
+    fi
+    ;;
+  2)
+    read -rp "Masukkan Domain Anda : " domen
+    if [ -z "$domen" ]; then
+      echo "Domain tidak boleh kosong!"
+      exit 1
+    fi
+    echo "$domen" > /root/domain
+    host="$domen"
+    ;;
+  *)
+    echo "Pilihan tidak valid, keluar."
+    exit 1
+    ;;
+esac
+
+echo -e "${green}Done!${NC}"
+sleep 1
 clear
-echo "IP=$host" >> /var/lib/premium-script/ipvps.conf
-echo "IP=$host" >> /var/lib/crot-script/ipvps.conf
-echo "$host" >> /root/domain
-#clear
-#echo -e "\e[0;32mREADY FOR INSTALLATION SCRIPT...\e[0m"
-#echo -e ""
-#sleep 1
-#Install SSH-VPN
+
+# Simpan IP/host ke file config
+echo "IP=$host" > /var/lib/premium-script/ipvps.conf
+echo "IP=$host" > /var/lib/crot-script/ipvps.conf
+
+# Pastikan /root/domain berisi domain terakhir yang dipakai
+echo "$host" > /root/domain
+
+# ==============================
+# Instal SSH + WebSocket + Dropbear
+# ==============================
 echo -e "\e[0;32mINSTALLING SSH-VPN...\e[0m"
 sleep 1
-wget https://${Server_URL}/ssh-vpn.sh && chmod +x ssh-vpn.sh && ./ssh-vpn.sh
-sleep 3
-clear
-echo -e "\e[0;32mINSTALLING XRAY CORE...\e[0m"
-sleep 3
-wget -q -O /root/xray.sh "https://${Server_URL}/xray.sh"
-chmod +x /root/xray.sh
-./xray.sh
-echo -e "${GREEN}Done!${NC}"
+wget -q -O /root/ssh-vpn.sh "https://${Server_URL}/ssh-vpn.sh"
+chmod +x /root/ssh-vpn.sh
+/root/ssh-vpn.sh
+echo -e "${green}Done!${NC}"
 sleep 2
 clear
-#Install SET-BR
+
+# ==============================
+# Instal XRAY CORE (VMESS/VLESS/TROJAN WS + XTLS)
+# ==============================
+echo -e "\e[0;32mINSTALLING XRAY CORE...\e[0m"
+sleep 1
+wget -q -O /root/xray.sh "https://${Server_URL}/xray.sh"
+chmod +x /root/xray.sh
+/root/xray.sh
+echo -e "${green}Done!${NC}"
+sleep 2
+clear
+
+# ==============================
+# Install Set-BR (iptables, banner, dsb)
+# ==============================
 echo -e "\e[0;32mINSTALLING SET-BR...\e[0m"
 sleep 1
 wget -q -O /root/set-br.sh "https://${Server_URL}/set-br.sh"
 chmod +x /root/set-br.sh
-./set-br.sh
-echo -e "${GREEN}Done!${NC}"
+/root/set-br.sh
+echo -e "${green}Done!${NC}"
 sleep 2
 clear
+
+# ==============================
+# Install L2TP/IPsec
+# ==============================
 echo -e "\e[0;32mINSTALLING L2TP/IPSEC...\e[0m"
 sleep 1
 wget -q -O /root/l2tp.sh "https://${Server_URL}/l2tp.sh"
 chmod +x /root/l2tp.sh
-./l2tp.sh
-echo -e "${GREEN}Done!${NC}"
+/root/l2tp.sh
+echo -e "${green}Done!${NC}"
 sleep 2
 clear
 
-#rm -rf /usr/share/nginx/html/index.html
-#wget -q -O /usr/share/nginx/html/index.html "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/OTHERS/index.html"
-
-# Finish
-rm -f /root/ins-xray.sh
+# Bersihkan file installer
+rm -f /root/xray.sh
 rm -f /root/set-br.sh
 rm -f /root/ssh-vpn.sh
+rm -f /root/l2tp.sh
+rm -f /root/cf.sh 2>/dev/null
 
-# Version
+# Simpan versi script
 echo "1.0" > /home/ver
+
 clear
 echo ""
 echo -e "${RB}      .-------------------------------------------.${NC}"
@@ -198,10 +230,13 @@ echo -e "  ${RB}♦️${NC} ${YB}HTTP                    : 80, 8080, 8880${NC}"
 echo -e "  ${RB}♦️${NC} ${YB}HTTPS                   : 443${NC}"
 echo -e "${BB}————————————————————————————————————————————————————————${NC}"
 echo ""
+
 secs_to_human "$(($(date +%s) - ${start}))"
 echo ""
-rm -r setup.sh
+
+# Hapus dirinya sendiri
+rm -f setup.sh
+
 echo ""
-echo ""
-read -p "$( echo -e "tekan ${orange}[ ${NC}${green}Enter${NC} ${CYAN}]${NC} untuk memulai ulang") "
+read -p "$( echo -e "Tekan ${orange}[ ${NC}${green}Enter${NC} ${orange}]${NC} untuk memulai ulang VPS...") " 
 reboot
