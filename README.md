@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <h2 align="center">
- XRAY Multiport Websocket By RakhaVPN 
-<br> Support CustomPath / worryfree ( Vless Only)
+ XRAY Multiport Websocket By RakhaVPN
+<br> Support CustomPath / worryfree ( Vmess Only)
+<br> Ready for SNI + wildcard domain usage across VMESS/VLESS/Trojan/SSH Websocket
   
 <h2 align="center"> ♦️Supported Linux Distribution♦️</h2>
 <p align="center"><img src="https://d33wubrfki0l68.cloudfront.net/5911c43be3b1da526ed609e9c55783d9d0f6b066/9858b/assets/img/debian-ubuntu-hover.png"width="400"></p>
@@ -40,17 +41,26 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.di
   ```html
 apt update && apt install -y bzip2 gzip coreutils screen curl && wget https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/setup2.sh && chmod +x setup2.sh && ./setup2.sh
   ```
+
+♦️ Update ke versi terbaru dari repo ini<br>
+
+  ```bash
+curl -fsSL https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/update.sh -o update.sh && bash update.sh
+  ```
 <b>
 
 ## ⏩ XRAY MULTIPORT WEBSOCKET AUTOSCRIPT DETAILS ⏪
 <b>
 [ XRAY SERVICES ] <br>
 <br>
-♦️ XRAY VMESS WEBSOCKET TLS & NON-TLS 443/80<br>
-♦️ XRAY VLESS WEBSOCKET TLS & NON-TLS 443/80 (SUPPORT CUSTOMPATH /WORRYFREE)<br>
-♦️ XRAY TROJAN WEBSOCKET TLS & NON-TLS 443/80<br>
+♦️ XRAY VMESS WEBSOCKET TLS & NON-TLS 443/80 (support SNI & wildcard)<br>
+♦️ XRAY VMESS WEBSOCKET TLS & NON-TLS 443/80 (SUPPORT CUSTOMPATH /WORRYFREE & SNI)<br>
+♦️ XRAY TROJAN WEBSOCKET TLS & NON-TLS 443/80 (support SNI & wildcard)<br>
+♦️ XRAY VLESS WEBSOCKET TLS & NON-TLS 443/80 (support SNI & wildcard)<br>
 ♦️ XRAY TROJAN TCP XTLS 443<br>
 ♦️ XRAY TROJAN TCP TLS 443<br>
+♦️ SSH Websocket + Dropbear + Stunnel (SNI friendly payload)<br>
+♦️ L2TP/IPsec server (pre-shared key + user/password)<br>
 <br>
 [ OTHER SERVICES ] <br>
 <br>
