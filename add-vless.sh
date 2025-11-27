@@ -2,7 +2,7 @@
 # =========================================
 # Quick Setup | Script Setup Manager
 # Edisi   : Stable Edition V1.0
-# Pembuat : Rakha-VPN
+# Pembuat : Rakha-VPN (mod RPAVPN by yanzwrt)
 # (C) Hak Cipta 2025
 # =========================================
 
@@ -39,16 +39,18 @@ until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${CLIENT_EXISTS} == '0' ]]; do
     fi
 done
 
+# BUG / SNI
 read -p "➤ Bug Address (cth: www.google.com) : " address
 read -p "➤ Bug SNI/Host (cth: m.facebook.com) : " hst
 read -p "➤ Masa Aktif (hari) : " masaaktif
 
-# SET KONFIGURASI
+# SET KONFIGURASI BUG ADDRESS (wildcard: bug.domain)
 bug_addr=${address}.
 bug_addr2=${address}
 sts=${bug_addr2}
 [[ $address != "" ]] && sts=${bug_addr}
 
+# SET KONFIGURASI SNI / HOST
 bug=${hst}
 bug2=${domain}
 sni=${bug2}
@@ -69,11 +71,20 @@ systemctl restart xray@vless.service
 systemctl restart xray@vnone.service
 service cron restart
 
-# LINK
-vlesslink1="vless://${uuid}@${sts}${domain}:443?type=ws&encryption=none&security=tls&host=${domain}&path=/vless&allowInsecure=1&sni=${sni}#XRAY_VLESS_TLS_${user}"
-vlesslink2="vless://${uuid}@${sts}${domain}:80?type=ws&encryption=none&security=none&host=${domain}&path=/vless#XRAY_VLESS_NTLS_${user}"
+# =========================
+#   LINK VLESS
+# =========================
+# TLS: pakai SNI/bug untuk host & sni
+vlesslink1="vless://${uuid}@${sts}${domain}:443?type=ws&encryption=none&security=tls&host=${sni}&path=/vless&allowInsecure=1&sni=${sni}#XRAY_VLESS_TLS_${user}"
 
-cat > /home/vps/public_html/$user-$exp-VLESSTLS.yaml <<EOF
+# NON-TLS: pakai SNI/bug untuk host header
+vlesslink2="vless://${uuid}@${sts}${domain}:80?type=ws&encryption=none&security=none&host=${sni}&path=/vless#XRAY_VLESS_NTLS_${user}"
+
+# =========================
+#   YAML CLASH VLESS TLS
+# =========================
+# diseragamkan nama file dengan output: user-VLESSTLS.yaml
+cat > /home/vps/public_html/$user-VLESSTLS.yaml <<EOF
 port: 7890
 socks-port: 7891
 redir-port: 7892
@@ -217,7 +228,7 @@ proxies:
     ws-opts:
       path: /vless
       headers:
-        Host: ${domain}
+        Host: ${sni}
     udp: true
 proxy-groups:
   - name: RakhaVPN-Autoscript
@@ -229,7 +240,11 @@ rules:
   - MATCH,RakhaVPN-Autoscript
 EOF
 
-cat > /home/vps/public_html/$user-$exp-VLESSNTLS.yaml <<EOF
+# =========================
+#   YAML CLASH VLESS NON-TLS
+# =========================
+# diseragamkan nama file dengan output: user-VLESSNTLS.yaml
+cat > /home/vps/public_html/$user-VLESSNTLS.yaml <<EOF
 port: 7890
 socks-port: 7891
 redir-port: 7892
@@ -373,7 +388,7 @@ proxies:
     ws-opts:
       path: /vless
       headers:
-        Host: ${domain}
+        Host: ${sni}
     udp: true
 proxy-groups:
   - name: RakhaVPN-Autoscript
@@ -382,7 +397,7 @@ proxy-groups:
       - XRAY_VLESS_NTLS_${user}
       - DIRECT
 rules:
-  - MATCH,rakhaVPN-Autoscript
+  - MATCH,RakhaVPN-Autoscript
 EOF
 
 # OUTPUT
@@ -392,15 +407,16 @@ echo -e "${WB}             Detail Akun XRAY VLESS WS          ${NC}"
 echo -e "${BB}════════════════════════════════════════════════${NC}"
 echo -e "📌 Username         : ${user}"
 echo -e "🌐 Domain           : ${domain}"
+echo -e "📡 Wildcard         : ${address}.${domain}"
 echo -e "🔐 IP/Host          : ${MYIP}"
 echo -e "🔒 Port TLS         : 443"
 echo -e "🔓 Port Non-TLS     : 80, 8080, 8880"
 echo -e "🆔 UUID             : ${uuid}"
-echo -e "🔒 Security         : TLS"
-echo -e "🔁 Network          : WS"
+echo -e "🔁 Network          : ws"
 echo -e "📄 Path TLS         : /vless"
 echo -e "📄 Path Non-TLS     : /vless"
-echo -e "🧩 Multipath        : /yourpath"
+echo -e "🐞 Bug Address      : ${address}"
+echo -e "🐞 Bug SNI/Host     : ${sni}"
 echo -e "📆 Tanggal Dibuat   : ${hariini}"
 echo -e "⏳ Berakhir Pada    : ${exp}"
 echo -e "${BB}════════════════════════════════════════════════${NC}"
@@ -408,10 +424,10 @@ echo -e "🔗 Link TLS         : ${vlesslink1}"
 echo -e "${BB}════════════════════════════════════════════════${NC}"
 echo -e "🔗 Link Non-TLS     : ${vlesslink2}"
 echo -e "${BB}════════════════════════════════════════════════${NC}"
-echo -e "📄 YAML TLS         : http://${MYIP2}:81/$user-VLESSTLS.yaml"
-echo -e "📄 YAML Non-TLS     : http://${MYIP2}:81/$user-VLESSNTLS.yaml"
+echo -e "📄 YAML TLS         : http://${MYIP2}:81/${user}-VLESSTLS.yaml"
+echo -e "📄 YAML Non-TLS     : http://${MYIP2}:81/${user}-VLESSNTLS.yaml"
 echo -e "${BB}════════════════════════════════════════════════${NC}"
-echo -e "✨ Script by: Rakha-VPN"
+echo -e "✨ Script by: Rakha-VPN x RPAVPN"
 echo ""
 read -p "$(echo -e "${YB}Tekan Enter untuk kembali ke menu ...${NC}")"
 menu
