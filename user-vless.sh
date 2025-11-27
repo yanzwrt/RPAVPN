@@ -13,7 +13,9 @@ green() { echo -e "\\033[32;1m${*}\\033[0m"; }
 red() { echo -e "\\033[31;1m${*}\\033[0m"; }
 
 clear
-MYIP=$(curl -sS ipv4.icanhazip.com)
+MYIP=$(curl -sS ifconfig.me)
+MYIP2=$(curl -sS ipv4.icanhazip.com)
+domain=$(cat /root/domain)
 
 NUMBER_OF_CLIENTS=$(grep -c -E "^### " "/usr/local/etc/xray/vless.json")
 if [[ ${NUMBER_OF_CLIENTS} == '0' ]]; then
@@ -32,7 +34,7 @@ echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━�
 echo " Pilih user yang ingin dilihat konfigurasinya:"
 echo " Tekan CTRL+C untuk kembali ke menu"
 echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-echo "     Tidak ada pengguna yang kadaluwarsa"
+echo "     Daftar akun tersedia:"
 grep -E "^### " "/usr/local/etc/xray/vless.json" | cut -d ' ' -f 2-3 | nl -s ') '
 
 until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]]; do
@@ -44,20 +46,29 @@ echo ""
 read -p "Masukkan Bug Address (Contoh: www.google.com) : " address
 read -p "Masukkan Bug SNI/Host (Contoh : m.facebook.com) : " hst
 
-bug_addr=${address}.
-bug_addr2=${address}
-sts=$([ -z "$address" ] && echo "$bug_addr2" || echo "$bug_addr")
+# BUG ADDRESS
+bug_addr="${address}."
+bug_addr2="${address}"
+if [[ -z "$address" ]]; then
+    sts="$bug_addr2"
+else
+    sts="$bug_addr"
+fi
 
-bug=${hst}
-bug2=${domain}
-sni=$([ -z "$hst" ] && echo "$bug2" || echo "$bug")
+# SNI / HOST
+bug="${hst}"
+bug2="${domain}"
+if [[ -z "$hst" ]]; then
+    sni="$bug2"
+else
+    sni="$bug"
+fi
 
 user=$(grep -E "^### " "/usr/local/etc/xray/vless.json" | cut -d ' ' -f 2 | sed -n "${CLIENT_NUMBER}"p)
-domain=$(cat /root/domain)
-uuid=$(grep "},{" /usr/local/etc/xray/vless.json | cut -b 11-46 | sed -n "${CLIENT_NUMBER}"p)
 exp=$(grep -E "^### " "/usr/local/etc/xray/vless.json" | cut -d ' ' -f 3 | sed -n "${CLIENT_NUMBER}"p)
 hariini=$(date +"%Y-%m-%d")
 
+# Di add-vless, uuid=$user, jadi pakai user sebagai ID
 vlesslink1="vless://${user}@${sts}${domain}:443?type=ws&encryption=none&security=tls&host=${domain}&path=/vless&allowInsecure=1&sni=${sni}#XRAY_VLESS_TLS_${user}"
 vlesslink2="vless://${user}@${sts}${domain}:80?type=ws&encryption=none&security=none&host=${domain}&path=/vless#XRAY_VLESS_NTLS_${user}"
 
@@ -81,18 +92,18 @@ echo -e "➤ Multipath          : /yourpath"
 echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "➤ Dibuat             : ${hariini}"
 echo -e "➤ Expired            : ${exp}"
-echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}
+echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "➤ Link WS TLS        :"
 echo -e "${green}${vlesslink1}${NC}"
 echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "➤ Link WS Non-TLS    :"
 echo -e "${green}${vlesslink2}${NC}"
 echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "➤ YAML WS TLS        : http://${MYIP}:81/${user}-VLESSTLS.yaml"
-echo -e "➤ YAML WS Non-TLS    : http://${MYIP}:81/${user}-VLESSNTLS.yaml"
-echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}""
+echo -e "➤ YAML WS TLS        : http://${MYIP2}:81/${user}-${exp}-VLESSTLS.yaml"
+echo -e "➤ YAML WS Non-TLS    : http://${MYIP2}:81/${user}-${exp}-VLESSNTLS.yaml"
+echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e ""
 echo -e "          ${green}Autoscript by RakhaVPN${NC}"
 echo -e ""
-read -p "$( echo -e "Tekan ${green}[Enter]${NC} untuk kembali ke menu...") "
+read -p "$( echo -e "Tekan ${green}[Enter]${NC} untuk kembali ke menu...") " _
 menu
