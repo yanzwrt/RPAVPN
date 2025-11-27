@@ -1,3 +1,5 @@
+
+```bash
 #!/bin/bash
 # =========================================
 # Penyiapan Cepat | Manajer Setup Skrip
@@ -5,7 +7,10 @@
 # Pembuat: RakhaVPN
 # (C) Hak Cipta 2025
 # =========================================
+
 clear
+
+# Warna
 DEFBOLD='\e[39;1m'
 RB='\e[31;1m'
 GB='\e[32;1m'
@@ -18,40 +23,43 @@ red='\e[1;31m'
 green='\e[0;32m'
 purple='\e[0;35m'
 orange='\e[0;33m'
+CYAN='\e[0;36m'
 NC='\e[0m'
+
 export Server_URL="raw.githubusercontent.com/yanzwrt/RPAVPN/main"
+
+# Ambil tanggal dari Google
 dateFromServer=$(curl -v --insecure --silent https://google.com/ 2>&1 | grep Date | sed -e 's/< Date: //')
 biji=$(date +"%Y-%m-%d" -d "$dateFromServer")
-##########################
-MYIP=$(wget -qO- ipv4.icanhazip.com)
-MYIP=$(curl -s ipinfo.io/ip)
-MYIP=$(curl -sS ipv4.icanhazip.com)
+
+# IP VPS (satu kali saja)
 MYIP=$(curl -sS ifconfig.me)
+
 echo "Memeriksa VPS..."
+sleep 1
 clear
 
 purple() { echo -e "\\033[35;1m${*}\\033[0m"; }
 tyblue() { echo -e "\\033[36;1m${*}\\033[0m"; }
 yellow() { echo -e "\\033[33;1m${*}\\033[0m"; }
-green()  { echo -e "\\033[32;1m${*}\\033[0m"; }
-red()    { echo -e "\\033[31;1m${*}\\033[0m"; }
+green_txt()  { echo -e "\\033[32;1m${*}\\033[0m"; }
+red_txt()    { echo -e "\\033[31;1m${*}\\033[0m"; }
 
 # Cek root dan OpenVZ
 if [ "${EUID}" -ne 0 ]; then
-    echo "Skrip ini harus dijalankan sebagai root."
-    exit 1
+ echo "Skrip ini harus dijalankan sebagai root."
+ exit 1
 fi
+
 if [ "$(systemd-detect-virt)" == "openvz" ]; then
-    echo "OpenVZ tidak didukung."
-    exit 1
+ echo "OpenVZ tidak didukung."
+ exit 1
 fi
-MYIP=$(wget -qO- icanhazip.com/ip);
-MYIP=$(curl -s ipinfo.io/ip )
-MYIP=$(curl -sS ipv4.icanhazip.com)
-MYIP=$(curl -sS ifconfig.me )
+
 secs_to_human() {
-    echo "Waktu instalasi : $(( ${1} / 3600 )) jam $(( (${1} / 60) % 60 )) menit $(( ${1} % 60 )) detik"
+ echo "Waktu instalasi : $(( ${1} / 3600 )) jam $(( (${1} / 60) % 60 )) menit $(( ${1} % 60 )) detik"
 }
+
 start=$(date +%s)
 
 echo -e "[ ${green}INFO${NC} ] Menyiapkan proses instalasi autoscript..."
@@ -59,81 +67,109 @@ apt install git curl -y >/dev/null 2>&1
 echo -e "[ ${green}INFO${NC} ] File instalasi siap! Memulai proses..."
 sleep 1
 
-if [ -f "/usr/local/etc/xray/domain" ]; then
-    echo "Script sudah terpasang sebelumnya."
-    exit 0
+# Cek apakah sudah pernah terinstall
+if [ -f "/usr/local/etc/xray/config.json" ] && [ -f "/root/domain" ]; then
+ echo "Script sudah terpasang sebelumnya. Jika ingin install ulang, hapus /usr/local/etc/xray dan /root/domain dulu."
+ exit 0
 fi
 
-mkdir /var/lib/premium-script
-mkdir /var/lib/crot-script
+# Direktori data
+mkdir -p /var/lib/premium-script
+mkdir -p /var/lib/crot-script
+
 clear
 echo -e "${red}    ♦️${NC} ${green} PENGATURAN DOMAIN VPS     ${NC}"
 echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
 echo "1. Gunakan Domain dari Script"
 echo "2. Gunakan Domain Milik Sendiri"
 echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m${NC}"
-read -rp "Pilih Metode Instalasi Domain : " dom 
+read -rp "Pilih Metode Instalasi Domain [1/2] : " dom
 
-if test $dom -eq 1; then
-    clear
-    wget -q -O /root/cf.sh "https://${Server_URL}/cf.sh"
-    chmod +x /root/cf.sh
-    ./cf.sh
-elif test $dom -eq 2; then
-    read -rp "Masukkan Nama Domain Anda : " domen 
-    echo $domen > /root/domain
-else 
-    echo "Pilihan tidak ditemukan."
-    exit 1
-fi
+host=""
 
-echo -e "${GREEN}Berhasil!${NC}"
+case "$dom" in
+1)
+ clear
+ wget -q -O /root/cf.sh "https://${Server_URL}/cf.sh"
+ chmod +x /root/cf.sh
+ /root/cf.sh
+ # cf.sh seharusnya menulis domain ke /root/domain
+ if [ -f /root/domain ]; then
+   host=$(cat /root/domain)
+ else
+   echo "Gagal mendapatkan domain dari cf.sh"
+   exit 1
+ fi
+ ;;
+2)
+ read -rp "Masukkan Nama Domain Anda : " domen
+ if [ -z "$domen" ]; then
+   echo "Domain tidak boleh kosong!"
+   exit 1
+ fi
+ echo "$domen" > /root/domain
+ host="$domen"
+ ;;
+*)
+ echo "Pilihan tidak ditemukan."
+ exit 1
+ ;;
+esac
+
+echo -e "${green}Berhasil!${NC}"
 sleep 2
 clear
 
-echo "IP=$host" >> /var/lib/premium-script/ipvps.conf
-echo "IP=$host" >> /var/lib/crot-script/ipvps.conf
-echo "$host" >> /root/domain
-#clear
-#echo -e "\e[0;32mSIAP MENGINSTALL SCRIPT...\e[0m"
-#echo -e ""
-#sleep 1
-#Install SSH-VPN
+# Simpan IP/host ke file config
+echo "IP=$host" > /var/lib/premium-script/ipvps.conf
+echo "IP=$host" > /var/lib/crot-script/ipvps.conf
+echo "$host" > /root/domain
+
+# =================================
+# Install SSH-VPN (versi 2)
+# =================================
 echo -e "\e[0;32mINSTALLING SSH-VPN...\e[0m"
 sleep 1
-wget https://${Server_URL}/ssh-vpn2.sh && chmod +x ssh-vpn2.sh && ./ssh-vpn2.sh
+wget -q -O /root/ssh-vpn2.sh "https://${Server_URL}/ssh-vpn2.sh"
+chmod +x /root/ssh-vpn2.sh
+/root/ssh-vpn2.sh
 sleep 3
 clear
+
+# =================================
+# Install XRAY CORE (versi 2)
+# =================================
 echo -e "\e[0;32mINSTALLING XRAY CORE...\e[0m"
-sleep 3
+sleep 1
 wget -q -O /root/xray2.sh "https://${Server_URL}/xray2.sh"
 chmod +x /root/xray2.sh
-./xray2.sh
-echo -e "${GREEN}Done!${NC}"
+/root/xray2.sh
+echo -e "${green}Done!${NC}"
 sleep 2
 clear
-#Install SET-BR
+
+# =================================
+# Install SET-BR
+# =================================
 echo -e "\e[0;32mINSTALLING SET-BR...\e[0m"
 sleep 1
 wget -q -O /root/set-br.sh "https://${Server_URL}/set-br.sh"
 chmod +x /root/set-br.sh
-./set-br.sh
-echo -e "${GREEN}Done!${NC}"
+/root/set-br.sh
+echo -e "${green}Done!${NC}"
 sleep 2
 clear
 
-#rm -rf /usr/share/nginx/html/index.html
-#wget -q -O /usr/share/nginx/html/index.html "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/OTHERS/index.html"
-
-# Finish
-rm -f /root/ins-xray.sh
+# Bersihkan file installer
+rm -f /root/xray2.sh
 rm -f /root/set-br.sh
-rm -f /root/ssh-vpn.sh
+rm -f /root/ssh-vpn2.sh
+rm -f /root/cf.sh 2>/dev/null
 
 # Version
 echo "1.0" > /home/ver
+
 clear
-# OUTPUT AKHIR
 echo ""
 echo -e "${RB}      .-------------------------------------------.${NC}"
 echo -e "${RB}      |${NC}      ${CB}Instalasi Telah Selesai${NC}           ${RB}|${NC}"
@@ -183,10 +219,12 @@ echo -e "  ${RB}♦️${NC} ${YB}HTTP                    : 80, 8080, 8880${NC}"
 echo -e "  ${RB}♦️${NC} ${YB}HTTPS                   : 443${NC}"
 echo -e "${BB}————————————————————————————————————————————————————————${NC}"
 echo ""
+
 secs_to_human "$(($(date +%s) - ${start}))"
 echo ""
-rm -r setup2.sh
-echo ""
+
+rm -f setup2.sh
+
 echo ""
 read -p "$( echo -e "Tekan ${orange}[ ${NC}${green}Enter${NC} ${CYAN}]${NC} untuk memulai ulang...") "
 reboot
