@@ -129,6 +129,14 @@ chmod +x /root/set-br.sh
 echo -e "${GREEN}Done!${NC}"
 sleep 2
 clear
+echo -e "\e[0;32mINSTALLING L2TP/IPSEC...\e[0m"
+sleep 1
+wget -q -O /root/l2tp.sh "https://${Server_URL}/l2tp.sh"
+chmod +x /root/l2tp.sh
+./l2tp.sh
+echo -e "${GREEN}Done!${NC}"
+sleep 2
+clear
 
 #rm -rf /usr/share/nginx/html/index.html
 #wget -q -O /usr/share/nginx/html/index.html "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/OTHERS/index.html"
