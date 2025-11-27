@@ -5,6 +5,10 @@ y="\033[0;1;37m"
 yy="\033[0;1;32m"
 yl="\033[0;1;33m"
 wh="\033[0m"
+
+# Reset warna
+NC='\e[0m'
+
 ## Foreground
 DEFBOLD='\e[39;1m'
 RB='\e[31;1m'
@@ -14,33 +18,31 @@ BB='\e[34;1m'
 MB='\e[35;1m'
 CB='\e[35;1m'
 WB='\e[37;1m'
-# Informasi CPU
-cpu_usage1="$(ps aux | awk 'BEGIN {sum=0} {sum+=$3}; END {print sum}')"
-cpu_usage="$((${cpu_usage1/\.*/} / ${corediilik:-1}))"
-cpu_usage+=" %"
-load_cpu=$(printf '%-3s' "$(top -bn1 | awk '/Cpu/ { cpu = "" 100 - $8 "%" }; END { print cpu }')")
+
+# CPU usage (pakai top biar simpel)
+load_cpu=$(printf '%-3s' "$(top -bn1 | awk '/Cpu/ { cpu = 100 - $8; printf("%.0f%%", cpu) }')")
+
 # Domain & IP VPS
-domain=$(cat /root/domain)
-IPVPS=$(curl -s ipinfo.io/ip )
-IPVPS=$(curl -sS ipv4.icanhazip.com)
-IPVPS=$(curl -sS ifconfig.me )
+domain=$(cat /root/domain 2>/dev/null)
+IPVPS=$(curl -sS ipv4.icanhazip.com || curl -sS ifconfig.me)
+
 # Uptime OS
 uptime="$(uptime -p | cut -d " " -f 2-10)"
+
 # Info RAM
 tram=$(free -m | awk 'NR==2 {print $2}')
 uram=$(free -m | awk 'NR==2 {print $3}')
-# Total Akun XRAYS WS & XTLS
-vmess=$(grep -c -E "^### $user" "/usr/local/etc/xray/config.json")
-vless=$(grep -c -E "^### $user" "/usr/local/etc/xray/vless.json")
-trws=$(grep -c -E "^### $user" "/usr/local/etc/xray/trojanws.json")
-txtls=$(grep -c -E "^### $user" "/usr/local/etc/xray/xtrojan.json")
-tr=$(grep -c -E "^### $user" "/usr/local/etc/xray/trojan.json")
-# Total Bandwidth
-#ttoday="$(vnstat | grep today | awk '{print $8" "substr ($9, 1, 1)}')"
-#tyest="$(vnstat | grep yesterday | awk '{print $8" "substr ($9, 1, 1)}')"
-#tmon="$(vnstat -m | grep "$(date '+%Y-%m')" | awk '{print $8" "substr ($9, 1, 1)}')"
-daily_usage=$(vnstat -d --oneline | awk -F\; '{print $6}' | sed 's/ //')
-monthly_usage=$(vnstat -m --oneline | awk -F\; '{print $11}' | sed 's/ //')
+
+# Total Akun XRAYS
+vmess=$(grep -c -E "^### " "/usr/local/etc/xray/config.json" 2>/dev/null)
+vless=$(grep -c -E "^### " "/usr/local/etc/xray/vless.json" 2>/dev/null)
+trws=$(grep -c -E "^### " "/usr/local/etc/xray/trojanws.json" 2>/dev/null)
+txtls=$(grep -c -E "^### " "/usr/local/etc/xray/xtrojan.json" 2>/dev/null)
+tr=$(grep -c -E "^### " "/usr/local/etc/xray/trojan.json" 2>/dev/null)
+
+# Total Bandwidth (vnstat)
+daily_usage=$(vnstat -d --oneline 2>/dev/null | awk -F\; '{print $6}' | sed 's/ //')
+monthly_usage=$(vnstat -m --oneline 2>/dev/null | awk -F\; '{print $11}' | sed 's/ //')
 
 clear
 echo -e "${BB}╔════════════════════════════════════════════════════════════╗${NC}"
@@ -55,149 +57,160 @@ echo -e "  ${RB}♦️${NC} ${YB}CPU       : $load_cpu ${NC}"
 echo -e "  ${RB}♦️${NC} ${YB}RAM       : $uram MB / $tram MB ${NC}"
 echo -e "  ${RB}♦️${NC} ${YB}DOMAIN    : $domain ${NC}"
 echo -e "  ${RB}♦️${NC} ${YB}IP VPS    : $IPVPS ${NC}"
-echo -e "  ${RB}♦️${NC} ${YB}Bandwidth : Daily: $daily_usage / Monthly: $monthly_usage${NC}"
+echo -e "  ${RB}♦️${NC} ${YB}Bandwidth : Daily: ${daily_usage:-N/A} / Monthly: ${monthly_usage:-N/A}${NC}"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
 echo -e "                      ${WB}⚙️  Menu XRAYS  ⚙️${NC}"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
-echo -e "  ${RB}01.${NC} ${YB}XRAY VMESS WS     ${WB}[${GB}${vmess}${WB}]${NC}🌀"
-echo -e "  ${RB}02.${NC} ${YB}XRAY VLESS WS     ${WB}[${GB}${vless}${WB}]${NC}📡"
-echo -e "  ${RB}03.${NC} ${YB}XRAY TROJAN WS    ${WB}[${GB}${trws}${WB}]${NC}🛡️"
-echo -e "  ${RB}04.${NC} ${YB}XRAY TROJAN XTLS  ${WB}[${GB}${txtls}${WB}]${NC}🔐"
-echo -e "  ${RB}05.${NC} ${YB}XRAY TROJAN TCP   ${WB}[${GB}${tr}${WB}]${NC}🧰"
+echo -e "  ${RB}01.${NC} ${YB}XRAY VMESS WS     ${WB}[${GB}${vmess}${WB}]${NC} 🌀"
+echo -e "  ${RB}02.${NC} ${YB}XRAY VLESS WS     ${WB}[${GB}${vless}${WB}]${NC} 📡"
+echo -e "  ${RB}03.${NC} ${YB}XRAY TROJAN WS    ${WB}[${GB}${trws}${WB}]${NC} 🛡️"
+echo -e "  ${RB}04.${NC} ${YB}XRAY TROJAN XTLS  ${WB}[${GB}${txtls}${WB}]${NC} 🔐"
+echo -e "  ${RB}05.${NC} ${YB}XRAY TROJAN TCP   ${WB}[${GB}${tr}${WB}]${NC} 🧰"
+echo -e "  ${RB}06.${NC} ${YB}MENU SSH & WEBSOCKET                🔑"
+echo -e "  ${RB}07.${NC} ${YB}MENU L2TP / IPSEC                   🌐"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
 echo -e "                      ${WB}🛠️  Menu VPS  🛠️${NC}"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
-echo -e "  ${RB}06.${NC} ${YB}PASANG PEMBLOKIR IKLAN              🚫"
-echo -e "  ${RB}07.${NC} ${YB}PASANG TCP BBRPLUS                  🚀"
-echo -e "  ${RB}08.${NC} ${YB}MENU PEMBLOKIR IKLAN                🧹"
-echo -e "  ${RB}09.${NC} ${YB}GANTI DNS                           🧬"
-echo -e "  ${RB}10.${NC} ${YB}CEK NETFLIX                         🎬"
-echo -e "  ${RB}11.${NC} ${YB}BATAS KECEPATAN BANDWIDTH           📶"
-echo -e "  ${RB}12.${NC} ${YB}GANTI DOMAIN                        🌐"
-echo -e "  ${RB}13.${NC} ${YB}PERPANJANG CERT XRAYS               📜"
-echo -e "  ${RB}14.${NC} ${YB}CEK STATUS VPN                      📊"
-echo -e "  ${RB}15.${NC} ${YB}CEK PORT VPN                        🔍"
-echo -e "  ${RB}16.${NC} ${YB}RESTART LAYANAN VPN                 ♻️"
-echo -e "  ${RB}17.${NC} ${YB}UJI JARINGAN (Speedtest)            ⚡"
-echo -e "  ${RB}18.${NC} ${YB}CEK CPU & RAM                       🧠"
-echo -e "  ${RB}19.${NC} ${YB}CEK PENGGUNAAN BANDWIDTH            📈"
-echo -e "  ${RB}20.${NC} ${YB}CADANGKAN DATA                      💾"
-echo -e "  ${RB}21.${NC} ${YB}PULIHKAN DATA                       ♻️"
-echo -e "  ${RB}22.${NC} ${YB}REBOOT VPS                          🔁"
-echo -e "  ${RB}23.${NC} ${YB}MENU XRAY-CORE                      🧪"
-echo -e "  ${RB}24.${NC} ${YB}MENU SWAP RAM                       💿"
-echo -e "  ${RB}25.${NC} ${YB}BERSIHKAN LOG                       🧽"
-echo -e "  ${RB}26.${NC} ${YB}KELUAR                              ❌"
+echo -e "  ${RB}08.${NC} ${YB}PASANG PEMBLOKIR IKLAN              🚫"
+echo -e "  ${RB}09.${NC} ${YB}PASANG TCP BBRPLUS                  🚀"
+echo -e "  ${RB}10.${NC} ${YB}MENU PEMBLOKIR IKLAN                🧹"
+echo -e "  ${RB}11.${NC} ${YB}GANTI DNS                           🧬"
+echo -e "  ${RB}12.${NC} ${YB}CEK NETFLIX / MEDIA                 🎬"
+echo -e "  ${RB}13.${NC} ${YB}BATAS KECEPATAN BANDWIDTH           📶"
+echo -e "  ${RB}14.${NC} ${YB}GANTI DOMAIN                        🌐"
+echo -e "  ${RB}15.${NC} ${YB}PERPANJANG CERT XRAYS               📜"
+echo -e "  ${RB}16.${NC} ${YB}CEK STATUS VPN                      📊"
+echo -e "  ${RB}17.${NC} ${YB}CEK PORT VPN                        🔍"
+echo -e "  ${RB}18.${NC} ${YB}RESTART LAYANAN VPN                 ♻️"
+echo -e "  ${RB}19.${NC} ${YB}UJI JARINGAN (Speedtest)            ⚡"
+echo -e "  ${RB}20.${NC} ${YB}CEK CPU & RAM                       🧠"
+echo -e "  ${RB}21.${NC} ${YB}CEK PENGGUNAAN BANDWIDTH            📈"
+echo -e "  ${RB}22.${NC} ${YB}CADANGKAN DATA                      💾"
+echo -e "  ${RB}23.${NC} ${YB}PULIHKAN DATA                       ♻️"
+echo -e "  ${RB}24.${NC} ${YB}REBOOT VPS                          🔁"
+echo -e "  ${RB}25.${NC} ${YB}MENU XRAY-CORE                      🧪"
+echo -e "  ${RB}26.${NC} ${YB}MENU SWAP RAM                       💿"
+echo -e "  ${RB}27.${NC} ${YB}BERSIHKAN LOG                       🧽"
+echo -e "  ${RB}28.${NC} ${YB}TAMPILKAN INFO SYSTEM (NEOFETCH)    ❌"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
 echo ""
-read -p "📌 Pilih Menu [ 1 - 26 ] : " menu
+read -p "📌 Pilih Menu [ 1 - 28 ] : " menu
+
 case $menu in
-1)
-clear
-menu-ws
-;;
-2)
-clear
-menu-vless
-;;
-3)
-clear
-menu-tr
-;;
-4)
-clear
-menu-xrt
-;;
-5)
-clear
-menu-xtr
-;;
-6)
-clear
-ins-helium
-;;
-8)
-clear
-helium
-;;
-9)
-clear
-dns
-;;
-10)
-clear
-nf
-;;
-7)
-clear
-bbr
-;;
-11)
-clear
-limit
-;;
-12)
-clear
-add-host
-;;
-13)
-clear
-certxray
-;;
-14)
-clear
-status
-;;
-15)
-clear
-info
-;;
-16)
-clear
-restart
-;;
-17)
-clear
-speedtest
-;;
-18)
-clear
-htop
-;;
-23)
-clear
-wget -q -O /usr/bin/xraychanger "https://raw.githubusercontent.com/yanzwrt/Xcore-custompath/main/xraychanger.sh" && chmod +x /usr/bin/xraychanger && xraychanger
-;;
-24)
-clear
-wget -q -O /usr/bin/swapram "https://raw.githubusercontent.com/yanzwrt/swapram/main/swapram.sh" && chmod +x /usr/bin/swapram && swapram
-;;
-25)
-clear
-cleaner
-;;
-26)
-clear
-neofetch
-;;
-20)
-clear
-backup
-;;
-21)
-clear
-restore
-;;
-22)
-clear
-reboot
-;;
-19)
-clear
-vnstat
-;;
-*)
-clear
-menu
-;;
+  1)
+    clear
+    menu-ws
+    ;;
+  2)
+    clear
+    menu-vless
+    ;;
+  3)
+    clear
+    menu-tr
+    ;;
+  4)
+    clear
+    menu-xrt
+    ;;
+  5)
+    clear
+    menu-xtr
+    ;;
+  6)
+    clear
+    menu-ssh
+    ;;
+  7)
+    clear
+    menu-l2tp
+    ;;
+  8)
+    clear
+    ins-helium
+    ;;
+  9)
+    clear
+    bbr
+    ;;
+  10)
+    clear
+    helium
+    ;;
+  11)
+    clear
+    dns
+    ;;
+  12)
+    clear
+    nf
+    ;;
+  13)
+    clear
+    limit
+    ;;
+  14)
+    clear
+    add-host
+    ;;
+  15)
+    clear
+    certxray
+    ;;
+  16)
+    clear
+    status
+    ;;
+  17)
+    clear
+    info
+    ;;
+  18)
+    clear
+    restart
+    ;;
+  19)
+    clear
+    speedtest
+    ;;
+  20)
+    clear
+    htop
+    ;;
+  21)
+    clear
+    vnstat
+    ;;
+  22)
+    clear
+    backup
+    ;;
+  23)
+    clear
+    restore
+    ;;
+  24)
+    clear
+    reboot
+    ;;
+  25)
+    clear
+    wget -q -O /usr/bin/xraychanger "https://raw.githubusercontent.com/yanzwrt/Xcore-custompath/main/xraychanger.sh" && chmod +x /usr/bin/xraychanger && xraychanger
+    ;;
+  26)
+    clear
+    wget -q -O /usr/bin/swapram "https://raw.githubusercontent.com/yanzwrt/swapram/main/swapram.sh" && chmod +x /usr/bin/swapram && swapram
+    ;;
+  27)
+    clear
+    cleaner
+    ;;
+  28)
+    clear
+    neofetch
+    ;;
+  *)
+    clear
+    menu
+    ;;
 esac
