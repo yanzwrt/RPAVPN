@@ -9,28 +9,30 @@ red='\e[1;31m'
 green='\e[0;32m'
 NC='\e[0m'
 green() { echo -e "\\033[32;1m${*}\\033[0m"; }
-red() { echo -e "\\033[31;1m${*}\\033[0m"; }
+red()   { echo -e "\\033[31;1m${*}\\033[0m"; }
 
 clear
 MYIP=$(curl -sS ipv4.icanhazip.com)
+domain=$(cat /root/domain)
 
 NUMBER_OF_CLIENTS=$(grep -c -E "^### " "/usr/local/etc/xray/trojan.json")
 if [[ ${NUMBER_OF_CLIENTS} == '0' ]]; then
-    echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-    echo -e "\\E[0;47;30m        CEK KONFIG TROJAN TCP          \E[0m"
-    echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+    echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+    echo -e "\\E[0;47;30m      CEK KONFIG TROJAN TCP       \E[0m"
+    echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
     echo ""
     echo "Belum ada user yang terdaftar!"
+    echo ""
     exit 1
 fi
 
-echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-echo -e "\\E[0;47;30m        CEK KONFIG TROJAN TCP          \E[0m"
-echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo -e "\\E[0;47;30m      CEK KONFIG TROJAN TCP       \E[0m"
+echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 echo " Pilih user yang ingin dilihat konfigurasinya:"
-echo " Tekan CTRL+C untuk membatalkan"
-echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-echo "     No  Expired   Username"
+echo " Tekan CTRL+C untuk kembali ke menu"
+echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo "     Tidak ada pengguna kadaluwarsa"
 grep -E "^### " "/usr/local/etc/xray/trojan.json" | cut -d ' ' -f 2-3 | nl -s ') '
 
 until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]]; do
@@ -38,22 +40,27 @@ until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]];
 done
 
 clear
-read -p "Alamat Bug (contoh: www.google.com) : " address
-read -p "SNI/Host Bug (contoh: m.facebook.com) : " hst
+echo ""
+read -p "Masukkan Bug Address (Contoh: www.google.com)      : " address
+read -p "Masukkan Bug SNI/Host (Contoh : m.facebook.com)    : " hst
 
 bug_addr=${address}.
 bug_addr2=${address}
-sts=${bug_addr2}
-[[ -n $address ]] && sts=$bug_addr
+if [[ -z "$address" ]]; then
+  sts="$bug_addr2"
+else
+  sts="$bug_addr"
+fi
 
 bug=${hst}
 bug2=${domain}
-sni=${bug2}
-[[ -n $hst ]] && sni=$bug
+if [[ -z "$hst" ]]; then
+  sni="$bug2"
+else
+  sni="$bug"
+fi
 
 user=$(grep -E "^### " "/usr/local/etc/xray/trojan.json" | cut -d ' ' -f 2 | sed -n "${CLIENT_NUMBER}"p)
-domain=$(cat /root/domain)
-uuid=$(grep "},{" /usr/local/etc/xray/trojan.json | cut -b 17-52 | sed -n "${CLIENT_NUMBER}"p)
 exp=$(grep -E "^### " "/usr/local/etc/xray/trojan.json" | cut -d ' ' -f 3 | sed -n "${CLIENT_NUMBER}"p)
 hariini=$(date +"%Y-%m-%d")
 
@@ -61,29 +68,29 @@ trojanlink="trojan://${user}@${sts}${domain}:443?security=tls&type=tcp&allowInse
 
 clear
 echo -e ""
-echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "               ${green}XRAY TROJAN TCP CONFIG${NC}               "
-echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "               ${green}XRAY TROJAN TCP TLS${NC}                  "
+echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e "➤ Username           : ${user}"
 echo -e "➤ Domain             : ${domain}"
-echo -e "➤ IP/Host            : ${MYIP}"
+#echo -e "➤ IP/Host            : ${MYIP}"
+echo -e "➤ Alamat Bug         : ${sts}${domain}"
+echo -e "➤ SNI / Host         : ${sni}"
 echo -e "➤ Port               : 443"
-echo -e "➤ Key (Password)     : ${user}"
-echo -e "➤ Jaringan           : TCP"
+echo -e "➤ Network            : TCP"
 echo -e "➤ Security           : TLS"
-echo -e "➤ Allow Insecure     : True (Diizinkan)"
-echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "➤ Link Trojan        :"
+echo -e "➤ Allow Insecure     : true"
+echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "➤ Dibuat             : ${hariini}"
+echo -e "➤ Berakhir Pada      : ${exp}"
+echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "➤ Link TROJAN TCP TLS:"
 echo -e "${green}${trojanlink}${NC}"
-echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "➤ YAML Config        : http://${MYIP}:81/$user-TRTCP.yaml"
-echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "➤ Dibuat Pada        : $hariini"
-echo -e "➤ Kadaluarsa         : $exp"
-echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+echo -e "➤ YAML TROJAN TCP    : http://${MYIP}:81/${user}-${exp}-TRTCP.yaml"
+echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo -e ""
-echo -e "         ${green}Autoscript by RakhaVPN${NC}"
+echo -e "          ${green}Autoscript by RakhaVPN${NC}"
 echo -e ""
-
-read -p "$( echo -e "Tekan ${red}[ ${NC}${green}Enter${NC} ${red}]${NC} untuk kembali ke menu . . .") "
+read -p "$( echo -e "Tekan ${green}[Enter]${NC} untuk kembali ke menu...") "
 menu
