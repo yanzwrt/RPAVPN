@@ -3,200 +3,238 @@
 # Quick Setup | Script Setup Manager
 # Edition : Stable Edition V1.0
 # Auther  : RakhaVPN
-# (C) Copyright 2022
+# (C) Copyright 2025
 # =========================================
 
-# // Root Checking
+# === Warna & Label ===
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+BLUE='\033[0;34m'
+PURPLE='\033[0;35m'
+CYAN='\033[0;36m'
+LIGHT='\033[0;37m'
+NC='\033[0m'
+
+EROR="[${RED} ERROR ${NC}]"
+INFO="[${YELLOW} INFO ${NC}]"
+OKEY="[${GREEN} OKEY ${NC}]"
+
+BOLD="\e[1m"
+UNDERLINE="\e[4m"
+
+# === Cek Root ===
 if [ "${EUID}" -ne 0 ]; then
-		echo -e "${EROR} Please Run This Script As Root User !"
-		exit 1
+    echo -e "${EROR} Jalankan script ini sebagai root!"
+    exit 1
 fi
 
-# // Exporting Language to UTF-8
+# === Locale ===
 export LC_ALL='en_US.UTF-8' > /dev/null
 export LANG='en_US.UTF-8' > /dev/null
 export LANGUAGE='en_US.UTF-8' > /dev/null
 export LC_CTYPE='en_US.utf8' > /dev/null
 
-# // Export Color & Information
-export RED='\033[0;31m'
-export GREEN='\033[0;32m'
-export YELLOW='\033[0;33m'
-export BLUE='\033[0;34m'
-export PURPLE='\033[0;35m'
-export CYAN='\033[0;36m'
-export LIGHT='\033[0;37m'
-export NC='\033[0m'
+# === Konfigurasi Repo & Variabel ===
+# Folder ini silakan sesuaikan dengan struktur GitHub kamu
+# Misal kamu taruh di: RPAVPN/OVPN/...
+Server_URL_OVPN="https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/OVPN"
 
-# // Export Banner Status Information
-export EROR="[${RED} ERROR ${NC}]"
-export INFO="[${YELLOW} INFO ${NC}]"
-export OKEY="[${GREEN} OKEY ${NC}]"
-export PENDING="[${YELLOW} PENDING ${NC}]"
-export SEND="[${YELLOW} SEND ${NC}]"
-export RECEIVE="[${YELLOW} RECEIVE ${NC}]"
+Server_Port="443"
+Script_Mode="Stable"
+Auther="RakhaVPN"
 
-# // Export Align
-export BOLD="\e[1m"
-export WARNING="${RED}\e[5m"
-export UNDERLINE="\e[4m"
+# Domain dari autoscript kamu
+if [[ -f /root/domain ]]; then
+    domain=$(cat /root/domain)
+else
+    domain=$(curl -sS ipv4.icanhazip.com)
+fi
 
-# // Exporting URL Host
-export Server_URL="NevermoreSSH.github.io/lekong"
-export Server_URLL="raw.githubusercontent.com/NevermoreSSH/perizinan/main"
-export Server_Port="443"
-export Server_IP="underfined"
-export Script_Mode="Stable"
-export Auther="geovpn"
-domain=$(cat /cat /root/domain)
+# Interface publik
+NET=$(ip route show default | awk '{print $5}' | head -n1)
 
-# // Take VPS IP & Network Interface
-#MYIP2="s/xxxxxxxxx/$IP/g"
+# Placeholder untuk diganti di file .ovpn (xxxxxxxxx → domain)
 MYIP2="s/xxxxxxxxx/$domain/g"
-NET=$(ip route show default | awk '{print $5}')
 
-# // Installing Update
+clear
+echo -e "${YELLOW}========================================${NC}"
+echo -e " ${GREEN}Instalasi & Konfigurasi OpenVPN (TCP/UDP/SSL)${NC}"
+echo -e "${YELLOW}========================================${NC}"
+sleep 1
+
+# === Update & Dependensi ===
+echo -e "${INFO} Update & upgrade paket..."
 apt update -y
 apt upgrade -y
 apt dist-upgrade -y
 apt autoremove -y
 apt clean -y
 
-# // Installing Requirement Tools
+echo -e "${INFO} Menginstall paket pendukung..."
 apt install openvpn unzip -y
-apt install openssl iptables iptables-persistent -y
+apt install openssl iptables iptables-persistent netfilter-persistent -y
 
-# // Remove OpenVPN Directory & Recreate
-rm -r -f /etc/openvpn
+# === Siapkan direktori OpenVPN ===
+echo -e "${INFO} Menyiapkan direktori /etc/openvpn..."
+rm -rf /etc/openvpn
 mkdir -p /etc/openvpn
+cd /etc/openvpn || exit 1
 
-# // Enter To OpenVPN Main Folder
-cd /etc/openvpn/
-wget -q -O cert.zip "https://${Server_URL}/OpenVPN-Certificate.zip"
-unzip -o cert.zip
+# === Download certificate bundle ===
+echo -e "${INFO} Mengunduh certificate bundle OpenVPN..."
+wget -q -O cert.zip "${Server_URL_OVPN}/OpenVPN-Certificate.zip"
+if [[ ! -f cert.zip ]]; then
+    echo -e "${EROR} Gagal mengunduh OpenVPN-Certificate.zip"
+    exit 1
+fi
+
+unzip -o cert.zip >/dev/null 2>&1
 rm -f cert.zip
-mkdir -p config
-rm -r -f server
-rm -r -f client
 
-# // Chwon Root Directory Data
+mkdir -p config
+rm -rf server client
+
+# === Permission ===
 chown -R root:root /etc/openvpn/
 
-# // Copying OpenVPN Plugin Auth To /usr/lib/openvpn
+# === Plugin auth PAM ===
 mkdir -p /usr/lib/openvpn/
-cp /usr/lib/x86_64-linux-gnu/openvpn/plugins/openvpn-plugin-auth-pam.so /usr/lib/openvpn/openvpn-plugin-auth-pam.so
+if [[ -f /usr/lib/x86_64-linux-gnu/openvpn/plugins/openvpn-plugin-auth-pam.so ]]; then
+    cp /usr/lib/x86_64-linux-gnu/openvpn/plugins/openvpn-plugin-auth-pam.so \
+       /usr/lib/openvpn/openvpn-plugin-auth-pam.so
+fi
 
-# // Enable AUTOSTART For OpenVPN
+# === Autostart OpenVPN ===
 sed -i 's/#AUTOSTART="all"/AUTOSTART="all"/g' /etc/default/openvpn
 
-# // Enable IPV4 Forward
+# === Enable IPv4 Forward ===
 echo 1 > /proc/sys/net/ipv4/ip_forward
 sed -i 's/#net.ipv4.ip_forward=1/net.ipv4.ip_forward=1/g' /etc/sysctl.conf
 
-# // Downloading OpenVPN Server Config
-wget -q -O /etc/openvpn/tcp.conf "https://${Server_URL}/tcp.conf"
-wget -q -O /etc/openvpn/udp.conf "https://${Server_URL}/udp.conf"
+# === Download server config TCP/UDP ===
+echo -e "${INFO} Mengunduh konfigurasi server OpenVPN..."
+wget -q -O /etc/openvpn/tcp.conf "${Server_URL_OVPN}/tcp.conf"
+wget -q -O /etc/openvpn/udp.conf "${Server_URL_OVPN}/udp.conf"
 
-# // Remove The OpenVPN Service & Replace New OpenVPN Service
+if [[ ! -f /etc/openvpn/tcp.conf || ! -f /etc/openvpn/udp.conf ]]; then
+    echo -e "${EROR} Gagal mengunduh tcp.conf atau udp.conf"
+    exit 1
+fi
+
+# === Ganti service openvpn ===
 rm -f /lib/systemd/system/openvpn-server@.service
-wget -q -O /etc/systemd/system/openvpn@.service "https://${Server_URL}/openvpn.service"
+wget -q -O /etc/systemd/system/openvpn@.service "${Server_URL_OVPN}/openvpn.service"
 
-# Enable OpenVPN & Start OpenVPN
 systemctl daemon-reload
-systemctl stop openvpn@tcp
-systemctl stop openvpn@udp
-systemctl disable openvpn@tcp
-systemctl disable openvpn@udp
+
+# === Enable & Start OpenVPN TCP/UDP ===
+systemctl stop openvpn@tcp 2>/dev/null
+systemctl stop openvpn@udp 2>/dev/null
+systemctl disable openvpn@tcp 2>/dev/null
+systemctl disable openvpn@udp 2>/dev/null
+
 systemctl enable openvpn@tcp
 systemctl enable openvpn@udp
 systemctl start openvpn@tcp
 systemctl start openvpn@udp
 
-# // Checking OpenVPN TCP Statuss
+# === Cek status TCP/UDP ===
 echo -e "${YELLOW}==============================${NC}"
-if [[ $( systemctl status openvpn@tcp | grep Active | awk '{print $3}' | sed 's/(//g' | sed 's/)//g' ) == "running" ]]; then
-echo -e "${OKEY} OpenVPN TCP Running !"
+if [[ $(systemctl is-active openvpn@tcp) == "active" ]]; then
+    echo -e "${OKEY} OpenVPN TCP Running!"
 else
-echo -e "${EROR} OpenVPN TCP Has Been Stopped !"
+    echo -e "${EROR} OpenVPN TCP Tidak Berjalan!"
 fi
 
-# // Checking OpenVPN UDP Statuss
-if [[ $( systemctl status openvpn@udp | grep Active | awk '{print $3}' | sed 's/(//g' | sed 's/)//g' ) == "running" ]]; then
-echo -e "${OKEY} OpenVPN UDP Running !"
+if [[ $(systemctl is-active openvpn@udp) == "active" ]]; then
+    echo -e "${OKEY} OpenVPN UDP Running!"
 else
-echo -e "${EROR} OpenVPN UDP Has Been Stopped !"
+    echo -e "${EROR} OpenVPN UDP Tidak Berjalan!"
 fi
 echo -e "${YELLOW}==============================${NC}"
-echo -e "${INFO} Enabling OpenVPN Daemon Service."
-echo "Starting Daemon Service For OpenVPN."
-echo "Successfull Started Daemon Service For OpenVPN."
+echo -e "${INFO} OpenVPN Daemon Service diaktifkan."
 
-# // Generating TCP To Cache Directory
-wget -q -O /etc/openvpn/config/tcp.ovpn "https://${Server_URL}/tcp.ovpn"
-wget -q -O /etc/openvpn/config/udp.ovpn "https://${Server_URL}/udp.ovpn"
-wget -q -O /etc/openvpn/config/ssl.ovpn "https://${Server_URL}/ssl.ovpn"
+# === Download template client config ===
+echo -e "${INFO} Mengunduh template config client (.ovpn)..."
+cd /etc/openvpn/config || exit 1
+wget -q -O tcp.ovpn "${Server_URL_OVPN}/tcp.ovpn"
+wget -q -O udp.ovpn "${Server_URL_OVPN}/udp.ovpn"
+wget -q -O ssl.ovpn "${Server_URL_OVPN}/ssl.ovpn"
 
-# // Adding IP Address To OpenVPN Client Configuration
-sed -i $MYIP2 /etc/openvpn/config/tcp.ovpn
-sed -i $MYIP2 /etc/openvpn/config/udp.ovpn
-sed -i $MYIP2 /etc/openvpn/config/ssl.ovpn
+if [[ ! -f tcp.ovpn || ! -f udp.ovpn || ! -f ssl.ovpn ]]; then
+    echo -e "${EROR} Gagal mengunduh template .ovpn"
+    exit 1
+fi
 
-# // Input Certificate to TCP Client Config
-echo '<ca>' >> /etc/openvpn/config/tcp.ovpn
-cat /etc/openvpn/ca.crt >> /etc/openvpn/config/tcp.ovpn
-echo '</ca>' >> /etc/openvpn/config/tcp.ovpn
+# === Replace placeholder xxxxxxxxx dengan domain/host ===
+sed -i "$MYIP2" /etc/openvpn/config/tcp.ovpn
+sed -i "$MYIP2" /etc/openvpn/config/udp.ovpn
+sed -i "$MYIP2" /etc/openvpn/config/ssl.ovpn
 
-# // Input Certificate to UDP Client Config
-echo '<ca>' >> /etc/openvpn/config/udp.ovpn
-cat /etc/openvpn/ca.crt >> /etc/openvpn/config/udp.ovpn
-echo '</ca>' >> /etc/openvpn/config/udp.ovpn
+# === Embed CA ke dalam tiap file .ovpn ===
+if [[ -f /etc/openvpn/ca.crt ]]; then
+    echo '<ca>' >> /etc/openvpn/config/tcp.ovpn
+    cat /etc/openvpn/ca.crt >> /etc/openvpn/config/tcp.ovpn
+    echo '</ca>' >> /etc/openvpn/config/tcp.ovpn
 
-# // Input Certificate to SSL-TCP Client Config
-echo '<ca>' >> /etc/openvpn/config/ssl.ovpn
-cat /etc/openvpn/ca.crt >> /etc/openvpn/config/ssl.ovpn
-echo '</ca>' >> /etc/openvpn/config/ssl.ovpn
+    echo '<ca>' >> /etc/openvpn/config/udp.ovpn
+    cat /etc/openvpn/ca.crt >> /etc/openvpn/config/udp.ovpn
+    echo '</ca>' >> /etc/openvpn/config/udp.ovpn
 
-# // Make ZIP For OpenVPN
-cd /etc/openvpn/config
-zip all.zip tcp.ovpn udp.ovpn ssl.ovpn
-cp all.zip /etc/${Auther}/webserver/all.zip
-cp tcp.ovpn /etc/${Auther}/webserver/tcp.ovpn
-cp udp.ovpn /etc/${Auther}/webserver/udp.ovpn
-cp ssl.ovpn /etc/${Auther}/webserver/ssl.ovpn
-cd /root/
+    echo '<ca>' >> /etc/openvpn/config/ssl.ovpn
+    cat /etc/openvpn/ca.crt >> /etc/openvpn/config/ssl.ovpn
+    echo '</ca>' >> /etc/openvpn/config/ssl.ovpn
+else
+    echo -e "${EROR} /etc/openvpn/ca.crt tidak ditemukan!"
+fi
 
-# // Setting IP Tables to MASQUERADE
-iptables -t nat -I POSTROUTING -s 10.10.11.0/24 -o $NET -j MASQUERADE
-iptables -t nat -I POSTROUTING -s 10.10.12.0/24 -o $NET -j MASQUERADE
-iptables-save > /etc/iptables.up.rules
-chmod +x /etc/iptables.up.rules
-iptables-restore -t < /etc/iptables.up.rules
-netfilter-persistent save > /dev/null 2>&1
-netfilter-persistent reload > /dev/null 2>&1
+# === Packaging ===
+echo -e "${INFO} Membuat paket all.zip untuk client..."
+zip -q all.zip tcp.ovpn udp.ovpn ssl.ovpn
 
-# // Adding Port To IPTables ( OpenVPN 1194 / TCP )
+# === Web directory (disamakan dengan YAML: /home/vps/public_html) ===
+WEB_DIR="/home/vps/public_html"
+mkdir -p "$WEB_DIR"
+
+cp all.zip  "$WEB_DIR/all-openvpn.zip"
+cp tcp.ovpn "$WEB_DIR/tcp.ovpn"
+cp udp.ovpn "$WEB_DIR/udp.ovpn"
+cp ssl.ovpn "$WEB_DIR/ssl.ovpn"
+
+cd /root/ || exit 0
+
+# === IP tables NAT & Port ===
+echo -e "${INFO} Mengatur iptables NAT & port OpenVPN..."
+
+iptables -t nat -I POSTROUTING -s 10.10.11.0/24 -o "$NET" -j MASQUERADE
+iptables -t nat -I POSTROUTING -s 10.10.12.0/24 -o "$NET" -j MASQUERADE
+
 iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 1194 -j ACCEPT
 iptables -I INPUT -m state --state NEW -m udp -p udp --dport 1194 -j ACCEPT
-iptables-save > /etc/iptables.up.rules
-iptables-restore -t < /etc/iptables.up.rules
-netfilter-persistent save > /dev/null 2>&1
-netfilter-persistent reload > /dev/null 2>&1
 
-# // Adding Port To IPTables ( OpenVPN 1195 / UDP )
 iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 1195 -j ACCEPT
 iptables -I INPUT -m state --state NEW -m udp -p udp --dport 1195 -j ACCEPT
-iptables-save > /etc/iptables.up.rules
-iptables-restore -t < /etc/iptables.up.rules
-netfilter-persistent save > /dev/null 2>&1
-netfilter-persistent reload > /dev/null 2>&1
 
-# // Adding Port To IPTables ( OpenVPN 1196 / TCP SSL )
 iptables -I INPUT -m state --state NEW -m tcp -p tcp --dport 1196 -j ACCEPT
 iptables -I INPUT -m state --state NEW -m udp -p udp --dport 1196 -j ACCEPT
+
 iptables-save > /etc/iptables.up.rules
 iptables-restore -t < /etc/iptables.up.rules
-netfilter-persistent save > /dev/null 2>&1
-netfilter-persistent reload > /dev/null 2>&1
 
-# // Remove Not Used Files
+netfilter-persistent save   >/dev/null 2>&1
+netfilter-persistent reload >/dev/null 2>&1
+
+# === Selesai ===
 rm -f /root/vpn.sh
+
+echo ""
+echo -e "${GREEN}OpenVPN berhasil di-install & dikonfigurasi.${NC}"
+echo -e "File config client bisa diunduh via:"
+echo -e "  ${CYAN}http://${domain}:81/tcp.ovpn${NC}"
+echo -e "  ${CYAN}http://${domain}:81/udp.ovpn${NC}"
+echo -e "  ${CYAN}http://${domain}:81/ssl.ovpn${NC}"
+echo -e "  ${CYAN}http://${domain}:81/all-openvpn.zip${NC}"
+echo ""
+echo -e "Script Mod By RakhaVPN"
+echo ""
