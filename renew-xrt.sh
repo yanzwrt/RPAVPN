@@ -33,7 +33,8 @@ echo -e "${green}╠════════════════════
 # Tampilkan daftar client
 grep -E "^### " "/usr/local/etc/xray/xtrojan.json" | cut -d ' ' -f 2-3 | nl -s ') '
 
-# Input pilihan
+# Input pilihan (inisialisasi dulu)
+CLIENT_NUMBER=0
 until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]]; do
 	if [[ ${CLIENT_NUMBER} == '1' ]]; then
 		read -rp "Pilih salah satu client [1]: " CLIENT_NUMBER
@@ -43,6 +44,7 @@ until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]];
 done
 
 read -p "📅 Perpanjang berapa hari?: " masaaktif
+
 user=$(grep -E "^### " "/usr/local/etc/xray/xtrojan.json" | cut -d ' ' -f 2 | sed -n "${CLIENT_NUMBER}"p)
 exp=$(grep -E "^### " "/usr/local/etc/xray/xtrojan.json" | cut -d ' ' -f 3 | sed -n "${CLIENT_NUMBER}"p)
 
@@ -50,14 +52,20 @@ now=$(date +%Y-%m-%d)
 d1=$(date -d "$exp" +%s)
 d2=$(date -d "$now" +%s)
 exp2=$(( (d1 - d2) / 86400 ))
-exp3=$(($exp2 + $masaaktif))
+
+# Kalau sudah kadaluarsa, hitung dari hari ini
+if [[ ${exp2} -lt 0 ]]; then
+    exp2=0
+fi
+
+exp3=$((exp2 + masaaktif))
 exp4=$(date -d "$exp3 days" +"%Y-%m-%d")
 
 # Update data
 sed -i "s/### $user $exp/### $user $exp4/g" /usr/local/etc/xray/xtrojan.json
 
 # Restart layanan
-systemctl restart xray@xtrojan
+systemctl restart xray@xtrojan.service
 service cron restart
 
 clear
