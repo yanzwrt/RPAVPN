@@ -11,6 +11,7 @@ green='\e[0;32m'
 orange='\033[0;33m'
 cyan='\033[0;36m'
 NC='\e[0m'
+
 NUMBER_OF_CLIENTS=$(grep -c -E "^### " "/usr/local/etc/xray/trojanws.json")
 
 if [[ ${NUMBER_OF_CLIENTS} == '0' ]]; then
@@ -29,10 +30,10 @@ echo -e "📌 Pilih client yang ingin diperpanjang masa aktifnya"
 echo -e "❎ Tekan CTRL+C untuk kembali"
 echo -e "${green}╠════════════════════════════════════════════════════╣${NC}"
 
-# Tampilkan daftar client
 grep -E "^### " "/usr/local/etc/xray/trojanws.json" | cut -d ' ' -f 2-3 | nl -s ') '
 
-# Input pilihan client
+# Inisialisasi dan input pilihan client
+CLIENT_NUMBER=0
 until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]]; do
     if [[ ${CLIENT_NUMBER} == '1' ]]; then
         read -rp "Pilih salah satu client [1]: " CLIENT_NUMBER
@@ -42,13 +43,21 @@ until [[ ${CLIENT_NUMBER} -ge 1 && ${CLIENT_NUMBER} -le ${NUMBER_OF_CLIENTS} ]];
 done
 
 read -p "📅 Perpanjang berapa hari?: " masaaktif
+
 user=$(grep -E "^### " "/usr/local/etc/xray/trojanws.json" | cut -d ' ' -f 2 | sed -n "${CLIENT_NUMBER}"p)
 exp=$(grep -E "^### " "/usr/local/etc/xray/trojanws.json" | cut -d ' ' -f 3 | sed -n "${CLIENT_NUMBER}"p)
+
 now=$(date +%Y-%m-%d)
 d1=$(date -d "$exp" +%s)
 d2=$(date -d "$now" +%s)
 exp2=$(( (d1 - d2) / 86400 ))
-exp3=$(($exp2 + $masaaktif))
+
+# Jika sudah kadaluwarsa, hitung dari hari ini
+if [[ ${exp2} -lt 0 ]]; then
+    exp2=0
+fi
+
+exp3=$((exp2 + masaaktif))
 exp4=$(date -d "$exp3 days" +"%Y-%m-%d")
 
 # Perbarui file konfigurasi
@@ -71,5 +80,5 @@ echo -e "${green}╚════════════════════
 echo ""
 echo -e "🛠️  Script Mod By Rakha-VPN"
 echo ""
-read -p "$(echo -e "Tekan ${orange}[ ${NC}${green}Enter${NC} ${orange}]${NC} untuk kembali ke menu...") "
+read -p "$(echo -e "Tekan ${orange}[ ${NC}${green}Enter${NC} ${orange}]${NC} untuk kembali ke menu...") " 
 menu
