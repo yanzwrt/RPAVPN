@@ -2,7 +2,7 @@
 # =========================================
 # Quick Setup | Script Setup Manager
 # Edisi   : Stable Edition V1.0
-# Pembuat : Rakha-VPN
+# Pembuat : Rakha-VPN (mod RPAVPN by yanzwrt)
 # =========================================
 
 # === Warna ===
@@ -20,13 +20,14 @@ dateFromServer=$(curl -s --insecure https://google.com/ | grep Date | sed -e 's/
 biji=$(date +"%Y-%m-%d" -d "$dateFromServer")
 
 # === IP & Domain ===
-MYIP=$(curl -s ipv4.icanhazip.com)
+MYIP=$(curl -sS ifconfig.me)
+MYIP2=$(curl -sS ipv4.icanhazip.com)
 domain=$(cat /root/domain)
 
 # === Header ===
 clear
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${WHITE}     ⇱ XRAY TROJAN TCP TLS ⇲            ${NC}"
+echo -e "${WHITE}        ⇱ XRAY TROJAN TCP TLS ⇲        ${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 
 # === Input Username ===
@@ -36,7 +37,8 @@ until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${user_EXISTS} == '0' ]]; do
 
 	if [[ ${user_EXISTS} == '1' ]]; then
 		echo -e "${RED}✖ Username sudah terdaftar!${NC}"
-		exit 1
+		read -n 1 -s -r -p "Tekan tombol apapun untuk kembali..."
+		menu
 	fi
 done
 
@@ -45,18 +47,27 @@ read -rp "$(echo -e "➤ ${CYAN}Bug Address${NC}      : ") " -e address
 read -rp "$(echo -e "➤ ${CYAN}SNI/Host Bug${NC}     : ") " -e hst
 read -rp "$(echo -e "➤ ${CYAN}Expired (hari)${NC}   : ") " -e masaaktif
 
-# === Logic Domain & SNI ===
+# === Logic Bug Address & SNI (disamakan dengan script lain) ===
+# BUG ADDRESS → wildcard: bug.domain
 bug_addr=${address}.
-sts=${address:-$bug_addr}
-sni=${hst:-$domain}
+bug_addr2=${address}
+sts=${bug_addr2}
+[[ $address != "" ]] && sts=${bug_addr}
+
+# SNI / HOST
+bug=${hst}
+bug2=${domain}
+sni=${bug2}
+[[ $hst != "" ]] && sni=${bug}
+
 hariini=$(date -d "0 days" +"%Y-%m-%d")
 exp=$(date -d "$masaaktif days" +"%Y-%m-%d")
 
 # === Tambah User ke Config ===
-sed -i "/#tr$/a\### ${user} ${exp}\
-},{\"password\": \"${user}\",\"email\": \"${user}\"" /usr/local/etc/xray/trojan.json
+sed -i '/#tr$/a\### '"$user $exp"'\
+},{"password": "'$user'","email": "'$user'"' /usr/local/etc/xray/trojan.json
 
-# === Link Trojan ===
+# === Link Trojan (pakai bug & SNI) ===
 trojanlink="trojan://${user}@${sts}${domain}:443?security=tls&type=tcp&allowInsecure=1&sni=${sni}#XRAY_TROJAN_TCP_${user}"
 
 # === Restart Service ===
@@ -129,25 +140,29 @@ rules:
 EOF
 
 # === Output Akhir ===
+clear
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e "${WHITE}          Detail Akun Trojan TCP        ${NC}"
+echo -e "${WHITE}          Detail Akun Trojan TCP       ${NC}"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e " ${WHITE}Remarks${NC}       : ${user}"
-echo -e " ${WHITE}Domain${NC}        : ${domain}"
-echo -e " ${WHITE}IP/Host${NC}       : ${MYIP}"
-echo -e " ${WHITE}Key/Password${NC}  : ${user}"
-echo -e " ${WHITE}Port${NC}          : 443"
-echo -e " ${WHITE}Network${NC}       : TCP"
-echo -e " ${WHITE}Security${NC}      : TLS"
-echo -e " ${WHITE}AllowInsecure${NC} : True"
+echo -e " ${WHITE}Remarks${NC}        : ${user}"
+echo -e " ${WHITE}Domain${NC}         : ${domain}"
+echo -e " ${WHITE}Wildcard${NC}       : ${address}.${domain}"
+echo -e " ${WHITE}IP/Host${NC}        : ${MYIP}"
+echo -e " ${WHITE}Key/Password${NC}   : ${user}"
+echo -e " ${WHITE}Port${NC}           : 443"
+echo -e " ${WHITE}Network${NC}        : TCP"
+echo -e " ${WHITE}Security${NC}       : TLS"
+echo -e " ${WHITE}SNI / Host${NC}     : ${sni}"
+echo -e " ${WHITE}Alamat Bug${NC}     : ${sts}${domain}"
+echo -e " ${WHITE}AllowInsecure${NC}  : True"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e " ${WHITE}Dibuat${NC}        : $hariini"
-echo -e " ${WHITE}Berakhir Pada${NC} : $exp"
+echo -e " ${WHITE}Dibuat${NC}         : $hariini"
+echo -e " ${WHITE}Berakhir Pada${NC}  : $exp"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e " ${WHITE}Link Trojan${NC}   : ${trojanlink}"
-echo -e " ${WHITE}YAML Clash${NC}    : http://${MYIP}:81/$user-$exp-TRTCP.yaml"
+echo -e " ${WHITE}Link Trojan${NC}    : ${trojanlink}"
+echo -e " ${WHITE}YAML Clash${NC}     : http://${MYIP2}:81/$user-$exp-TRTCP.yaml"
 echo -e "${BLUE}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-echo -e " ${CYAN}Script Mod By Rakha-VPN${NC}"
+echo -e " ${CYAN}Script Mod By Rakha-VPN x RPAVPN${NC}"
 echo ""
 read -p "$(echo -e "Tekan ${YELLOW}[Enter]${NC} untuk kembali ke menu...") "
 menu
