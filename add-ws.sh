@@ -2,7 +2,7 @@
 # =========================================
 # Quick Setup | Script Setup Manager
 # Edisi   : Stable Edition V1.0
-# Pembuat : RakhaVPN
+# Pembuat : RakhaVPN (mod: RPAVPN by yanzwrt)
 # (C) Hak Cipta 2025
 # =========================================
 
@@ -39,15 +39,18 @@ until [[ $user =~ ^[a-zA-Z0-9_]+$ && ${CLIENT_EXISTS} == '0' ]]; do
     fi
 done
 
+# BUG / SNI
 read -p "➤ Bug Address (cth: www.google.com) : " address
 read -p "➤ Bug SNI/Host (cth: m.facebook.com) : " hst
 read -p "➤ Masa Aktif (hari) : " masaaktif
 
+# BUG ADDRESS → untuk worryfree/wildcard: bug.domain
 bug_addr=${address}.
 bug_addr2=${address}
 sts=${bug_addr2}
 [[ $address != "" ]] && sts=${bug_addr}
 
+# SNI / HOST
 bug=${hst}
 bug2=${domain}
 sni=${bug2}
@@ -61,9 +64,13 @@ hariini=$(date +"%Y-%m-%d")
 sed -i '/#tls$/a\### '"$user $exp"'\
 },{"id": "'$user'","alterId": 0,"email": "'$user'"' /usr/local/etc/xray/config.json
 sed -i '/#none$/a\### '"$user $exp"'\
-},{"id": "'$user'","alterId": 0,"email": "'$user'"' /usr/local/etc/xray/none.json
+"},{"id": "'$user'","alterId": 0,"email": "'$user'"' /usr/local/etc/xray/none.json
 
-# Buat file konfigurasi vmess
+# =========================
+#   KONFIGURASI VMESS JSON
+# =========================
+
+# VMESS TLS (pakai SNI/bug untuk host & sni)
 cat > /usr/local/etc/xray/$user-tls.json <<EOF
 {
   "v": "2",
@@ -75,12 +82,13 @@ cat > /usr/local/etc/xray/$user-tls.json <<EOF
   "net": "ws",
   "path": "/vmess",
   "type": "none",
-  "host": "${domain}",
+  "host": "${sni}",
   "tls": "tls",
   "sni": "${sni}"
 }
 EOF
 
+# VMESS NON-TLS (pakai SNI/bug untuk host header, tanpa tls)
 cat > /usr/local/etc/xray/$user-none.json <<EOF
 {
   "v": "2",
@@ -92,7 +100,7 @@ cat > /usr/local/etc/xray/$user-none.json <<EOF
   "net": "ws",
   "path": "/vmess",
   "type": "none",
-  "host": "${domain}",
+  "host": "${sni}",
   "tls": "none"
 }
 EOF
@@ -106,7 +114,10 @@ systemctl restart xray.service
 systemctl restart xray@none.service
 service cron restart
 
-cat > /home/vps/public_html/$user-$exp-VMESSTLS.yaml <<EOF
+# =========================
+#   YAML CLASH TLS
+# =========================
+cat > /home/vps/public_html/$user-VMESSTLS.yaml <<EOF
 port: 7890
 socks-port: 7891
 redir-port: 7892
@@ -251,7 +262,7 @@ proxies:
     ws-opts:
       path: /vmess
       headers:
-        Host: ${domain}
+        Host: ${sni}
     udp: true
 proxy-groups:
   - name: RakhaVPN-Autoscript
@@ -263,7 +274,10 @@ rules:
   - MATCH,RakhaVPN-Autoscript
 EOF
 
-cat > /home/vps/public_html/$user-$exp-VMESSNTLS.yaml <<EOF
+# =========================
+#   YAML CLASH NON-TLS
+# =========================
+cat > /home/vps/public_html/$user-VMESSNTLS.yaml <<EOF
 port: 7890
 socks-port: 7891
 redir-port: 7892
@@ -403,12 +417,12 @@ proxies:
     cipher: auto
     tls: false
     skip-cert-verify: true
-    servername: ${domain}
+    servername: ${sni}
     network: ws
     ws-opts:
       path: /vmess
       headers:
-        Host: ${domain}
+        Host: ${sni}
     udp: true
 proxy-groups:
   - name: RakhaVPN-Autoscript
@@ -419,6 +433,7 @@ proxy-groups:
 rules:
   - MATCH,RakhaVPN-Autoscript
 EOF
+
 # OUTPUT
 clear
 echo -e "${BB}════════════════════════════════════════════════${NC}"
@@ -426,13 +441,14 @@ echo -e "${WB}             Detail Akun XRAY VMESS WS          ${NC}"
 echo -e "${BB}════════════════════════════════════════════════${NC}"
 echo -e "📌 Username         : ${user}"
 echo -e "🌐 Domain           : ${domain}"
-echo -e "📡 Wildcard         : bug.com.${domain}"
-#echo -e "🔐 IP/Host          : ${MYIP}"
+echo -e "📡 Wildcard         : ${address}.${domain}"
 echo -e "🔒 Port TLS         : 443"
 echo -e "🔓 Port Non-TLS     : 80, 8080, 8880"
 echo -e "🆔 UUID             : ${user}"
 echo -e "🔁 AlterId          : 0"
 echo -e "🔗 Path TLS-NTLS    : /vmess"
+echo -e "🐞 Bug Address      : ${address}"
+echo -e "🐞 Bug SNI/Host     : ${sni}"
 echo -e "📆 Tanggal Dibuat   : ${hariini}"
 echo -e "⏳ Berakhir Pada    : ${exp}"
 echo -e "${BB}════════════════════════════════════════════════${NC}"
@@ -440,10 +456,10 @@ echo -e "🔗 Link TLS         : ${vmesslink1}"
 echo -e "${BB}════════════════════════════════════════════════${NC}"
 echo -e "🔗 Link Non-TLS     : ${vmesslink2}"
 echo -e "${BB}════════════════════════════════════════════════${NC}"
-echo -e "📄 YAML TLS         : http://${MYIP2}:81/$user-VMESSTLS.yaml"
-echo -e "📄 YAML Non-TLS     : http://${MYIP2}:81/$user-VMESSNTLS.yaml"
+echo -e "📄 YAML TLS         : http://${MYIP2}:81/${user}-VMESSTLS.yaml"
+echo -e "📄 YAML Non-TLS     : http://${MYIP2}:81/${user}-VMESSNTLS.yaml"
 echo -e "${BB}════════════════════════════════════════════════${NC}"
-echo -e "✨ Script mod by: RakhaVPN"
+echo -e "✨ Script mod by: RakhaVPN x RPAVPN"
 echo ""
 read -p "$(echo -e "${YB}Tekan Enter untuk kembali ke menu ...${NC}")"
 menu
