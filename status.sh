@@ -18,94 +18,47 @@ echo -e " ${green}     🖥️  STATUS LAYANAN SERVER VPS  🖥️        ${NC}"
 echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
 
-status="$(systemctl show cron.service --no-page)"
-status_text=$(echo "${status}" | grep 'ActiveState=' | cut -f2 -d=)
-if [ "${status_text}" == "active" ]; then
-  echo -e " ${purple}♦${NC} Cron Service               : ${green}✅ Aktif (Berjalan)${NC}"
-else
-  echo -e " ${purple}♦${NC} Cron Service               : ${red}❌ Tidak Aktif (Error)${NC}"
-fi
+# Fungsi cek service
+cek_service() {
+  local svc="$1"
+  local label="$2"
 
-status="$(systemctl show nginx.service --no-page)"
-status_text=$(echo "${status}" | grep 'ActiveState=' | cut -f2 -d=)
-if [ "${status_text}" == "active" ]; then
-  echo -e " ${purple}♦${NC} Nginx Web Server           : ${green}✅ Aktif (Berjalan)${NC}"
-else
-  echo -e " ${purple}♦${NC} Nginx Web Server           : ${red}❌ Tidak Aktif (Error)${NC}"
-fi
+  status="$(systemctl show "${svc}.service" --no-page 2>/dev/null)"
+  status_text=$(echo "${status}" | grep 'ActiveState=' | cut -f2 -d=)
 
-status="$(systemctl show fail2ban.service --no-page)"
-status_text=$(echo "${status}" | grep 'ActiveState=' | cut -f2 -d=)
-if [ "${status_text}" == "active" ]; then
-  echo -e " ${purple}♦${NC} Fail2Ban Security          : ${green}✅ Aktif (Berjalan)${NC}"
-else
-  echo -e " ${purple}♦${NC} Fail2Ban Security          : ${red}❌ Tidak Aktif (Error)${NC}"
-fi
+  if [ "${status_text}" == "active" ]; then
+    echo -e " ${purple}♦${NC} ${label} : ${green}✅ Aktif (Berjalan)${NC}"
+  else
+    echo -e " ${purple}♦${NC} ${label} : ${red}❌ Tidak Aktif (Error)${NC}"
+  fi
+}
 
-status="$(systemctl show xray.service --no-page)"
-status_text=$(echo "${status}" | grep 'ActiveState=' | cut -f2 -d=)
-if [ "${status_text}" == "active" ]; then
-  echo -e " ${purple}♦${NC} XRAY Vmess TLS             : ${green}✅ Aktif (Berjalan)${NC}"
-else
-  echo -e " ${purple}♦${NC} XRAY Vmess TLS             : ${red}❌ Tidak Aktif (Error)${NC}"
-fi
+# ====== Layanan Sistem Dasar ======
+cek_service cron          "Cron Service               "
+cek_service nginx         "Nginx Web Server           "
+cek_service fail2ban      "Fail2Ban Security          "
 
-status="$(systemctl show xray@vless.service --no-page)"
-status_text=$(echo "${status}" | grep 'ActiveState=' | cut -f2 -d=)
-if [ "${status_text}" == "active" ]; then
-  echo -e " ${purple}♦${NC} XRAY Vless TLS             : ${green}✅ Aktif (Berjalan)${NC}"
-else
-  echo -e " ${purple}♦${NC} XRAY Vless TLS             : ${red}❌ Tidak Aktif (Error)${NC}"
-fi
+# ====== SSH & Dropbear ======
+# Sesuaikan nama service kalau berbeda di OS kamu
+cek_service ssh           "OpenSSH (SSH)              "
+cek_service dropbear      "Dropbear SSH               "
 
-status="$(systemctl show xray@trojanws.service --no-page)"
-status_text=$(echo "${status}" | grep 'ActiveState=' | cut -f2 -d=)
-if [ "${status_text}" == "active" ]; then
-  echo -e " ${purple}♦${NC} XRAY Trojan TLS (WS)       : ${green}✅ Aktif (Berjalan)${NC}"
-else
-  echo -e " ${purple}♦${NC} XRAY Trojan TLS (WS)       : ${red}❌ Tidak Aktif (Error)${NC}"
-fi
+# ====== L2TP / IPsec ======
+# strongSwan di-install dengan nama service "strongswan" di l2tp.sh
+cek_service strongswan    "IPsec (strongSwan)         "
+cek_service xl2tpd        "L2TP Server (xl2tpd)       "
 
-status="$(systemctl show xray@none.service --no-page)"
-status_text=$(echo "${status}" | grep 'ActiveState=' | cut -f2 -d=)
-if [ "${status_text}" == "active" ]; then
-  echo -e " ${purple}♦${NC} XRAY Vmess Non TLS         : ${green}✅ Aktif (Berjalan)${NC}"
-else
-  echo -e " ${purple}♦${NC} XRAY Vmess Non TLS         : ${red}❌ Tidak Aktif (Error)${NC}"
-fi
-
-status="$(systemctl show xray@vnone.service --no-page)"
-status_text=$(echo "${status}" | grep 'ActiveState=' | cut -f2 -d=)
-if [ "${status_text}" == "active" ]; then
-  echo -e " ${purple}♦${NC} XRAY Vless Non TLS         : ${green}✅ Aktif (Berjalan)${NC}"
-else
-  echo -e " ${purple}♦${NC} XRAY Vless Non TLS         : ${red}❌ Tidak Aktif (Error)${NC}"
-fi
-
-status="$(systemctl show xray@trnone.service --no-page)"
-status_text=$(echo "${status}" | grep 'ActiveState=' | cut -f2 -d=)
-if [ "${status_text}" == "active" ]; then
-  echo -e " ${purple}♦${NC} XRAY Trojan Non TLS        : ${green}✅ Aktif (Berjalan)${NC}"
-else
-  echo -e " ${purple}♦${NC} XRAY Trojan Non TLS        : ${red}❌ Tidak Aktif (Error)${NC}"
-fi
-
-status="$(systemctl show xray@xtrojan.service --no-page)"
-status_text=$(echo "${status}" | grep 'ActiveState=' | cut -f2 -d=)
-if [ "${status_text}" == "active" ]; then
-  echo -e " ${purple}♦${NC} XRAY Trojan TCP XTLS       : ${green}✅ Aktif (Berjalan)${NC}"
-else
-  echo -e " ${purple}♦${NC} XRAY Trojan TCP XTLS       : ${red}❌ Tidak Aktif (Error)${NC}"
-fi
-
-status="$(systemctl show xray@trojan.service --no-page)"
-status_text=$(echo "${status}" | grep 'ActiveState=' | cut -f2 -d=)
-if [ "${status_text}" == "active" ]; then
-  echo -e " ${purple}♦${NC} XRAY Trojan TCP TLS        : ${green}✅ Aktif (Berjalan)${NC}"
-else
-  echo -e " ${purple}♦${NC} XRAY Trojan TCP TLS        : ${red}❌ Tidak Aktif (Error)${NC}"
-fi
+# ====== XRAY Core ======
+cek_service xray          "XRAY Vmess TLS             "
+cek_service xray@none     "XRAY Vmess Non TLS         "
+cek_service xray@vless    "XRAY Vless TLS             "
+cek_service xray@vnone    "XRAY Vless Non TLS         "
+cek_service xray@trojanws "XRAY Trojan TLS (WS)       "
+cek_service xray@trnone   "XRAY Trojan Non TLS        "
+cek_service xray@xtrojan  "XRAY Trojan TCP XTLS       "
+cek_service xray@trojan   "XRAY Trojan TCP TLS        "
 
 echo ""
 echo -e "${red}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 echo ""
+
