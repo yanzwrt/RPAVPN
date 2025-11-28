@@ -9,7 +9,7 @@ set -euo pipefail
 REPO_URL="https://raw.githubusercontent.com/yanzwrt/RPAVPN/main"
 BIN_DIR="/usr/local/sbin"
 
-# Semua file penting yang di-pull dari repo
+# Semua file penting
 files=(
   menu.sh
   menu-ws.sh
@@ -77,20 +77,24 @@ echo ""
 for file in "${files[@]}"; do
   echo "🔧 Memperbarui: $file"
 
+  target="$BIN_DIR/$(basename "$file")"
+
   # Download aman, tidak fatal jika file tidak ada
-  if curl -fsSL "$REPO_URL/$file" -o "$BIN_DIR/$file"; then
-    chmod +x "$BIN_DIR/$file"
+  if curl -fsSL "$REPO_URL/$file" -o "$target"; then
+    chmod +x "$target"
     echo "✔ $file berhasil diperbarui"
+
+    # Khusus menu.sh ➜ sinkron ke perintah 'menu'
+    if [ "$file" = "menu.sh" ]; then
+      cp "$target" /usr/local/sbin/menu
+      cp "$target" /usr/bin/menu 2>/dev/null || true
+      chmod +x /usr/local/sbin/menu /usr/bin/menu 2>/dev/null || true
+      echo "  ↳ Sinkronisasi script ke perintah 'menu'"
+    fi
   else
     echo "⚠ $file dilewati (tidak ditemukan di repository)"
   fi
 done
-
-# Pastikan perintah "menu" memakai versi terbaru
-if [ -f "$BIN_DIR/menu.sh" ]; then
-  cp "$BIN_DIR/menu.sh" /usr/bin/menu
-  chmod +x /usr/bin/menu
-fi
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -102,6 +106,7 @@ systemctl restart nginx 2>/dev/null || true
 systemctl restart cron 2>/dev/null || true
 
 echo ""
-echo "✅ Pembaruan selesai!"
-echo "ℹ Jalankan 'menu' untuk menggunakan script terbaru."
+echo "✅ Update selesai. Jika ada perubahan besar, reboot VPS direkomendasikan."
 echo ""
+echo "Tekan Enter untuk kembali ke menu..."
+read
