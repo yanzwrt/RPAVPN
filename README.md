@@ -152,11 +152,11 @@ Script secara otomatis:
 ✔ menghapus YAML expired
 ✔ membersihkan konfigurasi JSON XRAY
 
-Semua berjalan otomatis via cron.
 ---
+
 ### 🥇 KELEBIHAN SCRIPT INI
 
-✔ Stabil & ringan
+✔ Stabil dan Ringan
 ✔ Multi-port + multipath
 ✔ Full CDN support
 ✔ SNI friendly
@@ -174,5 +174,5 @@ Maintained by: yanzwrt / RakhaVPN
 Free to use
 Free to modify
 Dilarang menjual tanpa izin resmi.
-
+---
 <p align="center"> <img src="https://img.shields.io/badge/STATUS-STABLE-green?style=for-the-badge"> <img src="https://img.shields.io/badge/AUTOSCRIPT-PREMIUM-blue?style=for-the-badge"> <img src="https://img.shields.io/badge/SUPPORT-CUSTOM%20PATH-orange?style=for-the-badge"> </p> <p align="center"><b>🌐 XRAY Websocket Multiprotocol by RakhaVPN • Powerful & Stable 🌐</b></p> ```
