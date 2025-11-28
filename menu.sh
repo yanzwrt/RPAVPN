@@ -19,7 +19,7 @@ MB='\e[35;1m'
 CB='\e[35;1m'
 WB='\e[37;1m'
 
-# CPU usage
+# CPU usage (pakai top biar simpel)
 load_cpu=$(printf '%-3s' "$(top -bn1 | awk '/Cpu/ { cpu = 100 - $8; printf("%.0f%%", cpu) }')")
 
 # Domain & IP VPS
@@ -27,7 +27,7 @@ domain=$(cat /root/domain 2>/dev/null)
 IPVPS=$(curl -sS ipv4.icanhazip.com || curl -sS ifconfig.me)
 
 # Uptime OS
-uptime="$(uptime -p | cut -d ' ' -f 2-10)"
+uptime="$(uptime -p | cut -d " " -f 2-10)"
 
 # Info RAM
 tram=$(free -m | awk 'NR==2 {print $2}')
@@ -40,17 +40,17 @@ trws=$(grep -c -E "^### " "/usr/local/etc/xray/trojanws.json" 2>/dev/null)
 txtls=$(grep -c -E "^### " "/usr/local/etc/xray/xtrojan.json" 2>/dev/null)
 tr=$(grep -c -E "^### " "/usr/local/etc/xray/trojan.json" 2>/dev/null)
 
-# Total Akun SSH (user UID >= 1000, kecuali nobody)
-ssh_count=$(awk -F: '$3 >= 1000 && $1 != "nobody" {print $1}' /etc/passwd 2>/dev/null | wc -l)
+# Perkiraan jumlah akun SSH (user normal, UID >= 1000, bukan nobody)
+ssh_count=$(awk -F: '$3>=1000 && $1!="nobody" {c++} END{print c+0}' /etc/passwd 2>/dev/null)
 
-# Total Akun L2TP/IPsec (hitung entri valid di chap-secrets)
-if [ -f /etc/ppp/chap-secrets ]; then
-  l2tp_count=$(grep -vE '^\s*#' /etc/ppp/chap-secrets | awk 'NF>=4' | wc -l)
+# Perkiraan jumlah akun L2TP (baris valid di /etc/ppp/chap-secrets)
+if [[ -f /etc/ppp/chap-secrets ]]; then
+    l2tp_count=$(grep -vE '^\s*($|#)' /etc/ppp/chap-secrets | wc -l)
 else
-  l2tp_count=0
+    l2tp_count=0
 fi
 
-# Total Bandwidth (vnstat)
+# Total Bandwidth (vnstat) – kalau vnstat belum ada, tampilkan N/A
 daily_usage=$(vnstat -d --oneline 2>/dev/null | awk -F\; '{print $6}' | sed 's/ //')
 monthly_usage=$(vnstat -m --oneline 2>/dev/null | awk -F\; '{print $11}' | sed 's/ //')
 
@@ -71,11 +71,11 @@ echo -e "  ${RB}♦️${NC} ${YB}Bandwidth : Daily: ${daily_usage:-N/A} / Monthl
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
 echo -e "                      ${WB}⚙️  Menu XRAYS  ⚙️${NC}"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
-echo -e "  ${RB}01.${NC} ${YB}XRAY VMESS WS        ${WB}[${GB}${vmess}${WB}]${NC} 🌀"
-echo -e "  ${RB}02.${NC} ${YB}XRAY VLESS WS        ${WB}[${GB}${vless}${WB}]${NC} 📡"
-echo -e "  ${RB}03.${NC} ${YB}XRAY TROJAN WS       ${WB}[${GB}${trws}${WB}]${NC} 🛡️"
-echo -e "  ${RB}04.${NC} ${YB}XRAY TROJAN XTLS     ${WB}[${GB}${txtls}${WB}]${NC} 🔐"
-echo -e "  ${RB}05.${NC} ${YB}XRAY TROJAN TCP      ${WB}[${GB}${tr}${WB}]${NC} 🧰"
+echo -e "  ${RB}01.${NC} ${YB}XRAY VMESS WS     ${WB}[${GB}${vmess}${WB}]${NC} 🌀"
+echo -e "  ${RB}02.${NC} ${YB}XRAY VLESS WS     ${WB}[${GB}${vless}${WB}]${NC} 📡"
+echo -e "  ${RB}03.${NC} ${YB}XRAY TROJAN WS    ${WB}[${GB}${trws}${WB}]${NC} 🛡️"
+echo -e "  ${RB}04.${NC} ${YB}XRAY TROJAN XTLS  ${WB}[${GB}${txtls}${WB}]${NC} 🔐"
+echo -e "  ${RB}05.${NC} ${YB}XRAY TROJAN TCP   ${WB}[${GB}${tr}${WB}]${NC} 🧰"
 echo -e "  ${RB}06.${NC} ${YB}MENU SSH & WEBSOCKET ${WB}[${GB}${ssh_count}${WB}]${NC} 🔑"
 echo -e "  ${RB}07.${NC} ${YB}MENU L2TP / IPSEC    ${WB}[${GB}${l2tp_count}${WB}]${NC} 🌐"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
@@ -102,7 +102,7 @@ echo -e "  ${RB}25.${NC} ${YB}MENU XRAY-CORE                      🧪"
 echo -e "  ${RB}26.${NC} ${YB}MENU SWAP RAM                       💿"
 echo -e "  ${RB}27.${NC} ${YB}BERSIHKAN LOG                       🧽"
 echo -e "  ${RB}28.${NC} ${YB}TAMPILKAN INFO SYSTEM (NEOFETCH)    ❌"
-echo -e "  ${RB}29.${NC} ${YB}UPDATE SCRIPT DARI GITHUB           📥"
+echo -e "  ${RB}29.${NC} ${YB}UPDATE SCRIPT DARI GITHUB           ⬆️"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
 echo ""
 read -p "📌 Pilih Menu [ 1 - 29 ] : " menu
@@ -136,6 +136,17 @@ case $menu in
  26)  clear; wget -q -O /usr/bin/swapram "https://raw.githubusercontent.com/yanzwrt/swapram/main/swapram.sh" && chmod +x /usr/bin/swapram && swapram ;;
  27)  clear; cleaner ;;
  28)  clear; neofetch ;;
- 29)  clear; bash /root/update.sh ;;
-  *)  clear; menu ;;
+ 29)
+      clear
+      echo "🔄 Menjalankan update dari GitHub..."
+      curl -fsSL https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/update.sh -o /root/update.sh
+      chmod +x /root/update.sh
+      bash /root/update.sh
+      read -n1 -r -p "Tekan tombol apapun untuk kembali ke menu..."
+      menu
+      ;;
+  *)
+      clear
+      menu
+      ;;
 esac
