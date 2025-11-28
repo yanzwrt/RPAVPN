@@ -106,6 +106,7 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1 \
 && wget https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/setup.sh \
 && chmod +x setup.sh \
 && ./setup.sh
+ ```
 
 ---
 
@@ -120,3 +121,4 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1 \
 && wget https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/setup.sh \
 && chmod +x setup.sh \
 && ./setup.sh  
+ ```
