@@ -129,18 +129,21 @@ apt update \
 curl -fsSL https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/update.sh -o update.sh \
 && bash update.sh
  ```
+---
+### 📁 STRUKTUR XRAY + PORT
+| Layanan         | Port Public      | Port Internal |
+| --------------- | ---------------- | ------------- |
+| VMESS WS TLS    | 443              | 1311          |
+| VMESS WS NTLS   | 80 / 8080 / 8880 | 23456         |
+| VLESS WS TLS    | 443              | 1312          |
+| VLESS WS NTLS   | 80               | 14016         |
+| TROJAN WS TLS   | 443              | 1313          |
+| TROJAN WS NTLS  | 80               | 25432         |
+| TROJAN TCP TLS  | 443              | 1310          |
+| TROJAN TCP XTLS | 443              | auto-routing  |
+---
 
-📁 STRUKTUR XRAY + PORT
-Layanan	Port Public	Port Internal
-VMESS WS TLS	443	1311
-VMESS WS NTLS	80 / 8080 / 8880	23456
-VLESS WS TLS	443	1312
-VLESS WS NTLS	80	14016
-TROJAN WS TLS	443	1313
-TROJAN WS NTLS	80	25432
-TROJAN TCP TLS	443	1310
-TROJAN TCP XTLS	443	auto-routing
-🗑 AUTO DELETE EXPIRED (xp.sh)
+### 🗑 AUTO DELETE EXPIRED (xp.sh)
 
 Script secara otomatis:
 
@@ -150,8 +153,8 @@ Script secara otomatis:
 ✔ membersihkan konfigurasi JSON XRAY
 
 Semua berjalan otomatis via cron.
-
-🥇 KELEBIHAN SCRIPT INI
+---
+### 🥇 KELEBIHAN SCRIPT INI
 
 ✔ Stabil & ringan
 ✔ Multi-port + multipath
@@ -161,8 +164,9 @@ Semua berjalan otomatis via cron.
 ✔ Clean log + auto maintenance
 ✔ Struktur JSON ringan
 ✔ Cocok untuk panel reseller
+---
 
-👨‍💻 DEVELOPER
+### 👨‍💻 DEVELOPER
 
 RakhaVPN Project
 Maintained by: yanzwrt / RakhaVPN
