@@ -85,7 +85,16 @@ Mendukung:
 ---
 
 # 📦 INSTALASI SCRIPT
-
+️ For Debian 10 / 11 For First Time Installation (Update Repo) <br>
+ 
+  ```html
+ apt update -y && apt upgrade -y && apt dist-upgrade -y && reboot
+  ```
+  ♦️ For Ubuntu 18.04 For First Time Installation (Update Repo) <br>
+  
+  ```html
+ apt-get update && apt-get upgrade -y && apt dist-upgrade -y && update-grub && reboot
+ ```
 ## 🅰️ FULL VERSION (Rekomendasi) — IPv6 OFF  
 Termasuk SSH WS + L2TP + XRAY lengkap.
 
@@ -100,7 +109,7 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1 \
 
 ---
 
-#### 🅰️ FULL VERSION (Rekomendasi) — IPv6 OFF  
+## 🅰️ FULL VERSION (Rekomendasi) — IPv6 OFF  
 Termasuk SSH WS + L2TP + XRAY lengkap.
 
 ```bash
