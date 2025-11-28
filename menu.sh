@@ -141,7 +141,6 @@ case $menu in
       echo "🔄 Menjalankan update dari GitHub..."
       curl -fsSL https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/update.sh -o /root/update.sh
       chmod +x /root/update.sh
-      bash /root/update.sh
       read -n1 -r -p "Tekan tombol apapun untuk kembali ke menu..."
       menu
       ;;
