@@ -100,9 +100,7 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1 \
 
 ---
 
-# 📦 INSTALASI SCRIPT
-
-## 🅰️ FULL VERSION (Rekomendasi) — IPv6 OFF  
+#### 🅰️ FULL VERSION (Rekomendasi) — IPv6 OFF  
 Termasuk SSH WS + L2TP + XRAY lengkap.
 
 ```bash
