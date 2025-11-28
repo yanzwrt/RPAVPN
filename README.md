@@ -99,14 +99,3 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1 \
 && ./setup.sh
 
 ---
-
-## 🅱️ LITE VERSION — IPv6 ON
-Versi ringan, hanya XRAY (Support WS + SNI).
-Tidak ada SSH & tidak ada L2TP.
-
-```bash
-apt update \
-&& apt install -y bzip2 gzip coreutils screen curl \
-&& wget https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/setup2.sh \
-&& chmod +x setup2.sh \
-&& ./setup2.sh
