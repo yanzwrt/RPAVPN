@@ -85,7 +85,7 @@ Script mendukung:
 ## 🅰️ **Full Version (Rekomendasi) – IPv6 OFF**
 Termasuk SSH-WS, L2TP, XRAY lengkap.
 
-```bash
+  ```html
 sysctl -w net.ipv6.conf.all.disable_ipv6=1 \
 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 \
 && apt update \
@@ -94,8 +94,11 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1 \
 && chmod +x setup.sh \
 && ./setup.sh
 
+---
 
-##🅱️ Lite Version – IPv6 ON
+# 📦 **LITE INSTALLATION**
+
+## 🅱️ **Lite Version – IPv6 ON**
 XRAY only (WS + SNI). Tanpa SSH & L2TP. Lebih ringan untuk VPS kecil.
 
   ```html
