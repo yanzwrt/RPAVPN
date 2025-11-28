@@ -137,11 +137,13 @@ case $menu in
  27)  clear; cleaner ;;
  28)  clear; neofetch ;;
  29)
+      29)
       clear
       echo "🔄 Menjalankan update dari GitHub..."
       curl -fsSL https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/update.sh -o /root/update.sh
       chmod +x /root/update.sh
-      read -n1 -r -p "Tekan tombol apapun untuk kembali ke menu..."
+      bash /root/update.sh
+      read -n1 -r -p "Tekan Enter untuk kembali ke menu..."
       menu
       ;;
   *)
