@@ -99,3 +99,17 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1 \
 && ./setup.sh
 
 ---
+
+# 📦 INSTALASI SCRIPT
+
+## 🅰️ FULL VERSION (Rekomendasi) — IPv6 OFF  
+Termasuk SSH WS + L2TP + XRAY lengkap.
+
+```bash
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 \
+&& sysctl -w net.ipv6.conf.default.disable_ipv6=1 \
+&& apt update \
+&& apt install -y bzip2 gzip coreutils screen curl \
+&& wget https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/setup.sh \
+&& chmod +x setup.sh \
+&& ./setup.sh  
