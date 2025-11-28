@@ -1,9 +1,8 @@
 #!/bin/bash
 # =========================================
-# Quick Setup | Script Setup Manager
-# Edition : Stable Edition V1.1
-# Author  : RakhaVPN
-# (C) Copyright 2025
+# Cek Pengguna Login XRAY Trojan WS
+# Auther  : RakhaVPN
+# Edition : Stable V1.0 (fix binary log)
 # =========================================
 
 red='\e[1;31m'
@@ -45,10 +44,11 @@ ada_login=false
 
 echo ""
 
+# Proses log lewat `strings` supaya tidak dianggap biner
+# lalu baru di-grep per user
 for user in "${users[@]}"; do
-  # Pakai -a supaya grep paksa baca log sebagai teks (hindari "binary file matches")
-  # Format default log xray biasanya: tanggal waktu IP:port ... email:user
-  ip_list=$(grep -a "$user" "$LOG_FILE" 2>/dev/null \
+  ip_list=$(strings -a "$LOG_FILE" 2>/dev/null \
+    | grep -F " ${user}" 2>/dev/null \
     | awk '{print $3}' \
     | cut -d: -f1 \
     | sort -u)
