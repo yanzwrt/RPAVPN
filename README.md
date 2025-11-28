@@ -19,9 +19,9 @@
 
 ---
 
-# ⚠️ **WAJIB DIBACA SEBELUM INSTALASI**
+# ⚠️ WAJIB DIPERHATIKAN SEBELUM INSTALL
 
-Jika menggunakan **Cloudflare**, wajib aktifkan/ubah:
+Jika memakai **Cloudflare CDN**, WAJIB atur:
 
 | Pengaturan | Status |
 |-----------|--------|
@@ -29,63 +29,67 @@ Jika menggunakan **Cloudflare**, wajib aktifkan/ubah:
 | Universal SSL | **ON** |
 | Always Use HTTPS | **OFF** |
 | TLS Recommender | **ON** |
-| Edge Certificates | aktif |
+| Edge Certificates | Aktif |
 
-Script mendukung:  
-✔ CDN Cloudflare  
-✔ Direct DNS  
-✔ Wildcard domain  
-✔ SNI Bug Host  
+Mendukung:
+✔ Bug Host / SNI  
+✔ Wildcard Domain  
+✔ Cloudflare Proxy / DNS Only  
+✔ CDN Mode  
 
 ---
 
-# 🧰 **FITUR LENGKAP AUTOSCRIPT**
+# 🧰 FITUR AUTOSCRIPT LENGKAP
 
-### 🟦 **XRAY Services**
-| Protocol | TLS | Non TLS | WS | XTLS | TCP | SNI | CustomPath |
-|---------|:---:|:-------:|:--:|:----:|:---:|:---:|:-----------:|
+### 🟦 XRAY Services
+| Layanan | TLS | NTLS | WS | TCP | XTLS | Custom Path | SNI |
+|--------|:---:|:----:|:--:|:---:|:---:|:------------:|:---:|
 | VMESS | ✔ | ✔ | ✔ | – | – | ✔ | ✔ |
 | VLESS | ✔ | ✔ | ✔ | – | – | ✔ | ✔ |
 | TROJAN WS | ✔ | ✔ | ✔ | – | – | ✔ | ✔ |
-| TROJAN TCP | ✔ | – | – | – | ✔ | ✔ | – |
-| TROJAN XTLS | ✔ | – | – | ✔ | ✔ | ✔ | – |
+| TROJAN TCP | ✔ | – | – | ✔ | – | – | ✔ |
+| TROJAN XTLS | ✔ | – | – | ✔ | ✔ | – | ✔ |
 
 ---
 
-### 🟩 **SSH & VPN Services**
-(Full version only — setup.sh)
+### 🟩 SSH & VPN Services  
+*(Full Version Only — setup.sh)*
 
 | Service | Status |
 |--------|--------|
-| SSH Websocket (WS + Dropbear) | ✔ |
-| Stunnel / OpenSSH | ✔ |
+| SSH Websocket (Dropbear + OpenSSH) | ✔ |
+| Stunnel5 TLS | ✔ |
+| SSH WS 80 / 443 | ✔ |
 | L2TP/IPsec (PSK + UserPass) | ✔ |
 
 ---
 
-### 🟨 **Fitur Tambahan**
-✔ YAML Generator  
-✔ Auto Delete Expired XRAY (xp.sh)  
-✔ Auto Backup & Restore  
-✔ Auto Clear Log  
-✔ Auto Reboot 03.00 WIB  
-✔ XRAY-Core Changer  
-✔ Multipath Support  
-✔ BBRPLUS Kernel Optimizer  
-✔ Network speedtest  
-✔ DNS Changer  
-✔ Netflix Region Checker  
-✔ Bandwidth Monitor (vnstat)  
+### 🟨 Fitur Tambahan
+✔ YAML generator  
+✔ Auto delete expired account (xp.sh)  
+✔ Auto reboot 03.00 WIB  
+✔ Auto backup & restore  
+✔ Auto clear log  
+✔ XRAY core changer  
+✔ Multipath support  
+✔ BBRplus Optimizer  
+✔ Limit speed user  
+✔ DNS changer  
+✔ Media checker (Netflix / Disney+ / dll)  
 ✔ CPU & RAM Monitor  
+✔ Speedtest CLI  
+✔ VNStat Bandwidth Monitor  
+✔ Ads blocker support  
+✔ Swap RAM Manager  
 
 ---
 
-# 📦 **PREMIUM INSTALLATION**
+# 📦 INSTALASI SCRIPT
 
-## 🅰️ **Full Version (Rekomendasi) – IPv6 OFF**
-Termasuk SSH-WS, L2TP, XRAY lengkap.
+## 🅰️ FULL VERSION (Rekomendasi) — IPv6 OFF  
+Termasuk SSH WS + L2TP + XRAY lengkap.
 
-  ```html
+```bash
 sysctl -w net.ipv6.conf.all.disable_ipv6=1 \
 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 \
 && apt update \
@@ -93,71 +97,3 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1 \
 && wget https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/setup.sh \
 && chmod +x setup.sh \
 && ./setup.sh
-
----
-
-# 📦 **LITE INSTALLATION**
-
-## 🅱️ **Lite Version – IPv6 ON**
-XRAY only (WS + SNI). Tanpa SSH & L2TP. Lebih ringan untuk VPS kecil.
-
-  ```html
-apt update \
-&& apt install -y bzip2 gzip coreutils screen curl \
-&& wget https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/setup2.sh \
-&& chmod +x setup2.sh \
-&& ./setup2.sh
-
-
-🔄 Update Script (Auto Pull from GitHub)
-bash
-Salin kode
-curl -fsSL https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/update.sh -o update.sh \
-&& bash update.sh
-🧪 Detail Port & Struktur XRAY
-Layanan	Port Public	Port Internal
-VMESS WS TLS	443	1311
-VMESS WS NTLS	80 / 8080 / 8880	23456
-VLESS WS TLS	443	1312
-VLESS WS NTLS	80	14016
-TROJAN WS TLS	443	1313
-TROJAN WS NTLS	80	25432
-TROJAN TCP XTLS	443	–
-TROJAN TCP TLS	443	1310
-
-📁 Struktur Auto-Clean (xp.sh)
-Akun yang expired otomatis dihapus dari:
-
-config.json
-
-none.json
-
-vless.json
-
-vnone.json
-
-trojanws.json
-
-trnone.json
-
-trojan.json
-
-xtrojan.json
-
-YAML user file
-
-🎯 Kelebihan Script Ini
-✔ Stabil dipakai ribuan user
-✔ Full auto maintenance
-✔ Tidak berat seperti script lain
-✔ Clean proxy structure
-✔ Sangat cocok untuk provider bug / SNI
-✔ Tidak bentrok port & service
-✔ Full systemd multi-instance
-
-📞 Developer
-RakhaVPN
-Autoscript by: yanzwrt / RakhaVPN Project
-
-Support fork & modifikasi pribadi.
-Dilarang menjual tanpa izin.
