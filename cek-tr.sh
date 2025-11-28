@@ -8,56 +8,64 @@
 
 red='\e[1;31m'
 green='\e[0;32m'
-yellow='\e[0;33m'
 NC='\e[0m'
 
 LOG_FILE="/var/log/xray/access3.log"
+CONF_FILE="/usr/local/etc/xray/trojanws.json"
 
 clear
 echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-echo -e "\\E[0;47;30m   Pengguna Login XRAY TROJAN WS  \E[0m"
+echo -e "\\E[0;47;30m     Pengguna Login XRAY Trojan WS     \E[0m"
 echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 
+# Cek file log
 if [[ ! -f "$LOG_FILE" ]]; then
-  echo -e " ${red}Log tidak ditemukan: $LOG_FILE${NC}"
+  echo ""
+  echo "Log tidak ditemukan: $LOG_FILE"
+  echo "Belum ada aktivitas koneksi atau XRAY belum menulis log."
   echo ""
   read -n1 -s -r -p "Press [ Enter ] kembali ke menu . . . "
   menu
   exit 0
 fi
 
-mapfile -t online_users < <(grep -a "email:" "$LOG_FILE" 2>/dev/null \
-  | awk -F'email: ' 'NF>1 {print $2}' \
-  | awk '{print $1}' \
-  | sort -u)
+# Ambil list user dari trojanws.json
+mapfile -t users < <(grep -E "^### " "$CONF_FILE" 2>/dev/null | awk '{print $2}')
 
-if [[ ${#online_users[@]} -eq 0 ]]; then
-  echo -e " ${yellow}Belum ada user TROJAN WS yang tercatat login.${NC}"
+if [[ ${#users[@]} -eq 0 ]]; then
+  echo ""
+  echo "Belum ada user Trojan WS yang terdaftar."
   echo ""
   read -n1 -s -r -p "Press [ Enter ] kembali ke menu . . . "
   menu
   exit 0
 fi
 
-printf " %-3s %-15s %-8s %-40s\n" "No" "User" "Login" "IP Terakhir"
-echo -e "-----------------------------------------------"
+ada_login=false
 
-no=1
-for user in "${online_users[@]}"; do
-  count=$(grep -a "email: ${user}" "$LOG_FILE" 2>/dev/null | wc -l)
-  last_ip=$(grep -a "email: ${user}" "$LOG_FILE" 2>/dev/null \
+echo ""
+
+for user in "${users[@]}"; do
+  # Pakai -a supaya grep paksa baca log sebagai teks (hindari "binary file matches")
+  # Format default log xray biasanya: tanggal waktu IP:port ... email:user
+  ip_list=$(grep -a "$user" "$LOG_FILE" 2>/dev/null \
     | awk '{print $3}' \
     | cut -d: -f1 \
-    | tail -n1)
-  [[ -z "$last_ip" ]] && last_ip="-"
+    | sort -u)
 
-  printf " %-3s %-15s %-8s %-40s\n" "$no" "$user" "$count" "$last_ip"
-  ((no++))
+  if [[ -n "$ip_list" ]]; then
+    ada_login=true
+    echo -e "${green}User : ${user}${NC}"
+    echo "$ip_list" | nl -s '. '
+    echo ""
+  fi
 done
 
-echo ""
+if [[ "$ada_login" = false ]]; then
+  echo "Tidak ada user Trojan WS yang sedang aktif / tercatat di log saat ini."
+  echo ""
+fi
+
 echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-echo -e " ${green}Selesai menampilkan login XRAY TROJAN WS.${NC}"
-echo ""
 read -n1 -s -r -p "Press [ Enter ] kembali ke menu . . . "
 menu
