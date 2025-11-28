@@ -92,9 +92,10 @@ echo -e "  ${RB}25.${NC} ${YB}MENU XRAY-CORE                      🧪"
 echo -e "  ${RB}26.${NC} ${YB}MENU SWAP RAM                       💿"
 echo -e "  ${RB}27.${NC} ${YB}BERSIHKAN LOG                       🧽"
 echo -e "  ${RB}28.${NC} ${YB}TAMPILKAN INFO SYSTEM (NEOFETCH)    ❌"
+echo -e "  ${RB}29.${NC} ${YB}UPDATE SCRIPT DARI GITHUB           ⬆️"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
 echo ""
-read -p "📌 Pilih Menu [ 1 - 28 ] : " menu
+read -p "📌 Pilih Menu [ 1 - 29 ] : " menu
 
 case $menu in
   1)
@@ -208,6 +209,22 @@ case $menu in
   28)
     clear
     neofetch
+    ;;
+  29)
+    clear
+    echo -e "${YB}▶ Mengecek & mengunduh update dari GitHub...${NC}"
+    if curl -fsSL "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/update.sh" -o /root/update.sh; then
+        chmod +x /root/update.sh
+        /root/update.sh
+        echo ""
+        echo -e "${GB}✔ Update selesai. Jika ada perubahan besar, reboot VPS direkomendasikan.${NC}"
+    else
+        echo ""
+        echo -e "${RB}✖ Gagal mengunduh update.sh dari GitHub. Periksa koneksi / URL.${NC}"
+    fi
+    echo ""
+    read -n1 -s -r -p "Tekan Enter untuk kembali ke menu..."
+    menu
     ;;
   *)
     clear
