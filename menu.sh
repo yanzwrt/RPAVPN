@@ -62,20 +62,26 @@ monthly_usage=$(vnstat -m --oneline 2>/dev/null | awk -F\; '{print $11}' | sed '
 #  CEK VERSI SCRIPT & UPDATE
 # ==========================
 
-LOCAL_VER="-"
-if [[ -f /home/ver ]]; then
-    LOCAL_VER=$(head -n1 /home/ver 2>/dev/null | tr -d '\r')
-fi
+# versi lokal dari /home/ver
+LOCAL_VER="$(cat /home/ver 2>/dev/null | head -n1 | tr -d '\r' || echo "-")"
 
-REMOTE_VER=$(curl -fsSL "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/ver" 2>/dev/null | head -n1 | tr -d '\r')
+# versi remote dari GitHub (file: ver)
+REMOTE_VER="$(curl -fsSL 'https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/ver' 2>/dev/null | head -n1 | tr -d '\r')"
 
+UPDATE_INFO=""
 UPDATE_LABEL=""
-VERSION_INFO="Versi Script : ${LOCAL_VER}"
 
-if [[ -n "$REMOTE_VER" && "$REMOTE_VER" != "$LOCAL_VER" ]]; then
-    # Ada versi baru
-    UPDATE_LABEL=" ${RB}[UPDATE v${REMOTE_VER}]${NC}"
-    VERSION_INFO="Versi Script : ${LOCAL_VER}  (Update tersedia ➜ v${REMOTE_VER})"
+if [[ -n "$REMOTE_VER" ]]; then
+    if [[ "$REMOTE_VER" != "$LOCAL_VER" ]]; then
+        UPDATE_INFO=" ${RB}♦️${NC} ${YB}New update available: v${REMOTE_VER} (current: v${LOCAL_VER})${NC}"
+        UPDATE_LABEL=" ${RB}[UPDATE v${REMOTE_VER}]${NC}"
+    else
+        UPDATE_INFO=" ${RB}♦️${NC} ${YB}Script sudah versi terbaru (v${LOCAL_VER})${NC}"
+        UPDATE_LABEL=""
+    fi
+else
+    UPDATE_INFO=" ${RB}♦️${NC} ${YB}Gagal cek update (cek koneksi / GitHub)${NC}"
+    UPDATE_LABEL=""
 fi
 
 clear
@@ -92,7 +98,7 @@ echo -e "  ${RB}♦️${NC} ${YB}RAM           : $uram MB / $tram MB ${NC}"
 echo -e "  ${RB}♦️${NC} ${YB}DOMAIN        : $domain ${NC}"
 echo -e "  ${RB}♦️${NC} ${YB}IP VPS        : $IPVPS ${NC}"
 echo -e "  ${RB}♦️${NC} ${YB}Bandwidth     : Daily: ${daily_usage:-N/A} / Monthly: ${monthly_usage:-N/A}${NC}"
-echo -e "  ${RB}♦️${NC} ${YB}${VERSION_INFO}${NC}"
+echo -e "  ${UPDATE_INFO}"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
 echo -e "                      ${WB}⚙️  Menu XRAYS  ⚙️${NC}"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
@@ -169,7 +175,7 @@ case $menu in
       bash /root/update.sh
 
       # Setelah update, sinkronkan versi lokal dengan versi di GitHub (jika ada)
-      NEW_VER=$(curl -fsSL "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/ver" 2>/dev/null | head -n1 | tr -d '\r')
+      NEW_VER="$(curl -fsSL 'https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/ver' 2>/dev/null | head -n1 | tr -d '\r')"
       if [[ -n "$NEW_VER" ]]; then
           echo "$NEW_VER" > /home/ver
       fi
