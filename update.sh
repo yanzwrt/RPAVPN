@@ -86,7 +86,14 @@ for file in "${files[@]}"; do
     echo "⚠ $file dilewati (tidak ditemukan di repository)"
   fi
 
+...
 done
+
+# Pastikan perintah "menu" memakai versi terbaru
+if [ -f "$BIN_DIR/menu.sh" ]; then
+  cp "$BIN_DIR/menu.sh" /usr/bin/menu
+  chmod +x /usr/bin/menu
+fi
 
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
