@@ -147,24 +147,23 @@ curl -fsSL https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/update.sh -o up
 
 Script secara otomatis:
 
-✔ menghapus user expired
-✔ restart service terkait
-✔ menghapus YAML expired
-✔ membersihkan konfigurasi JSON XRAY
-✔ BBRplus Optimizer 
+✔ menghapus user expired  
+✔ restart service terkait  
+✔ menghapus YAML expired  
+✔ membersihkan konfigurasi JSON XRAY  
 
 ---
 
 ### 🥇 KELEBIHAN SCRIPT INI
 
-✔ Stabil dan Ringan
-✔ Multi-port + multipath
-✔ Full CDN support
-✔ SNI friendly
-✔ Tidak bentrok port
-✔ Clean log + auto maintenance
-✔ Struktur JSON ringan
-✔ Cocok untuk panel reseller
+✔ Stabil dan Ringan  
+✔ Multi-port + multipath  
+✔ Full CDN support  
+✔ SNI friendly  
+✔ Tidak bentrok port  
+✔ Clean log + auto maintenance  
+✔ Struktur JSON ringan  
+✔ **Cocok untuk panel reseller** 
 ---
 
 ### 👨‍💻 DEVELOPER
