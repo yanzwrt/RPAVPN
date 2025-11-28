@@ -151,6 +151,7 @@ Script secara otomatis:
 ✔ restart service terkait
 ✔ menghapus YAML expired
 ✔ membersihkan konfigurasi JSON XRAY
+✔ BBRplus Optimizer 
 
 ---
 
