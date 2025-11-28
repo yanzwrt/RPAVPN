@@ -1,8 +1,9 @@
 #!/bin/bash
 # =========================================
-# Cek Pengguna Login XRAY Trojan WS
-# Auther  : RakhaVPN
-# Edition : Stable V1.0 (fix binary log)
+# Quick Setup | Script Setup Manager
+# Edition : Stable Edition V1.1
+# Author  : RakhaVPN
+# (C) Copyright 2025
 # =========================================
 
 red='\e[1;31m'
