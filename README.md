@@ -86,13 +86,13 @@ Mendukung:
 
 # 📦 INSTALASI SCRIPT
 
-️ ♦️ untuk debian 10/11/12 saat pertama install (Update Repo) <br>
+️ ## ♦️ untuk debian 10/11/12 saat pertama install (Update Repo) <br>
  
   ```html
  apt update -y && apt upgrade -y && apt dist-upgrade -y && reboot
   ```
 
-♦️ untuk ubuntu 18/20/22 saat pertama install (Update Repo) <br>
+## ♦️ untuk ubuntu 18/20/22 saat pertama install (Update Repo) <br>
   
   ```html
  apt-get update && apt-get upgrade -y && apt dist-upgrade -y && update-grub && reboot
