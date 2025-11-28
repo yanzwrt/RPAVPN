@@ -43,7 +43,7 @@ TMP_LOG=$(mktemp)
 # 1) Dari journalctl (service yang umum dipakai L2TP/IPsec)
 if command -v journalctl >/dev/null 2>&1; then
     journalctl -u xl2tpd -u ipsec -u strongswan-starter -u strongswan -u pppd \
-        --no-pager -n 2000 2>/dev/null >> "$TMP_LOG"
+        --no-pager -n 5000 2>/dev/null >> "$TMP_LOG"
 fi
 
 # 2) Dari file log klasik, kalau ada
@@ -53,7 +53,7 @@ done
 
 if [[ ! -s "$TMP_LOG" ]]; then
     echo ""
-    echo -e "${yellow}Tidak ada log L2TP yang bisa dibaca (journalctl & file log kosong / tidak ada).${NC}"
+    echo -e "${yellow}Tidak ada log L2TP/IPsec yang bisa dibaca (journalctl & file log kosong / tidak ada).${NC}"
     echo ""
     rm -f "$TMP_LOG"
     read -n1 -r -p "Press [ Enter ] kembali ke menu . . . "
@@ -76,12 +76,14 @@ for user in "${USERS[@]}"; do
     fi
 done
 
-rm -f "$TMP_LOG"
-
 if [[ $FOUND_ANY -eq 0 ]]; then
     echo ""
-    echo -e "${yellow}Belum ada aktivitas login L2TP yang tercatat (2000 baris log terakhir).${NC}"
+    echo -e "${yellow}Deteksi otomatis berdasarkan username belum menemukan aktivitas login.${NC}"
+    echo -e "${yellow}Berikut 80 baris log L2TP/IPsec terakhir (untuk cek manual):${NC}"
+    echo ""
+    grep -Ei "pppd|xl2tpd|l2tp|ipsec|strongswan" "$TMP_LOG" | tail -n 80
     echo ""
 fi
 
+rm -f "$TMP_LOG"
 read -n1 -r -p "Press [ Enter ] kembali ke menu . . . "
