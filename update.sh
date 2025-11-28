@@ -9,7 +9,7 @@ set -euo pipefail
 REPO_URL="https://raw.githubusercontent.com/yanzwrt/RPAVPN/main"
 BIN_DIR="/usr/local/sbin"
 
-# Semua file penting
+# Semua file penting yang di-pull dari repo
 files=(
   menu.sh
   menu-ws.sh
@@ -70,7 +70,6 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "      🔄 UPDATE SCRIPT RAKHA-VPN SYSTEM"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo ""
-
 echo "📥 Mengunduh pembaruan dari repository:"
 echo "➡ $REPO_URL"
 echo ""
@@ -85,8 +84,6 @@ for file in "${files[@]}"; do
   else
     echo "⚠ $file dilewati (tidak ditemukan di repository)"
   fi
-
-...
 done
 
 # Pastikan perintah "menu" memakai versi terbaru
