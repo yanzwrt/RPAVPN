@@ -23,12 +23,12 @@ WB='\e[37;1m'
 #  INFO SERVER & AKUN
 # ==========================
 
-# CPU usage
+# CPU usage (pakai top biar simpel)
 load_cpu=$(printf '%-3s' "$(top -bn1 | awk '/Cpu/ { cpu = 100 - $8; printf("%.0f%%", cpu) }')")
 
 # Domain & IP VPS
 domain=$(cat /root/domain 2>/dev/null)
-IPVPS=$(curl -sS ipv4.icanhazip.com 2>/dev/null || curl -sS ifconfig.me 2>/dev/null)
+IPVPS=$(curl -sS ipv4.icanhazip.com || curl -sS ifconfig.me)
 
 # Uptime OS
 uptime="$(uptime -p | cut -d " " -f 2-10)"
@@ -54,7 +54,7 @@ else
     l2tp_count=0
 fi
 
-# Total Bandwidth (vnstat)
+# Total Bandwidth (vnstat) – kalau vnstat belum ada, tampilkan N/A
 daily_usage=$(vnstat -d --oneline 2>/dev/null | awk -F\; '{print $6}' | sed 's/ //')
 monthly_usage=$(vnstat -m --oneline 2>/dev/null | awk -F\; '{print $11}' | sed 's/ //')
 
@@ -62,27 +62,28 @@ monthly_usage=$(vnstat -m --oneline 2>/dev/null | awk -F\; '{print $11}' | sed '
 #  CEK VERSI SCRIPT & UPDATE
 # ==========================
 
-# Versi lokal
 LOCAL_VER="-"
 if [[ -f /home/ver ]]; then
     LOCAL_VER=$(head -n1 /home/ver 2>/dev/null | tr -d '\r')
 fi
 
-# Versi di GitHub (file: ver)
-REMOTE_VER=$(curl -fsSL "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/ver" 2>/dev/null | head -n1 | tr -d '\r')
+REMOTE_VER=$(curl -fsSL "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/version_check_v2" 2>/dev/null | head -n1 | tr -d '\r')
 
 UPDATE_LABEL=""
-UPDATE_INFO="Versi Script : ${LOCAL_VER}"
+VERSION_INFO="Versi Script : ${LOCAL_VER}"
 
-if [[ -n "$REMOTE_VER" ]]; then
-    if [[ "$REMOTE_VER" != "$LOCAL_VER" ]]; then
-        UPDATE_LABEL=" ${RB}[UPDATE v${REMOTE_VER}]${NC}"
-        UPDATE_INFO="Versi Script : ${LOCAL_VER}  (Update tersedia ➜ v${REMOTE_VER})"
-    else
-        UPDATE_INFO="Versi Script : ${LOCAL_VER}  (Sudah versi terbaru)"
-    fi
+if [[ -z "$REMOTE_VER" ]]; then
+    # Gagal ambil versi remote
+    VERSION_INFO="Versi Script : ${LOCAL_VER}  (Gagal cek update GitHub)"
+    UPDATE_LABEL=""
+elif [[ "$REMOTE_VER" != "$LOCAL_VER" ]]; then
+    # Ada versi baru
+    VERSION_INFO="Versi Script : ${LOCAL_VER}  (Update tersedia ➜ v${REMOTE_VER})"
+    UPDATE_LABEL=" ${RB}[UPDATE v${REMOTE_VER}]${NC}"
 else
-    UPDATE_INFO="Versi Script : ${LOCAL_VER}  (Gagal cek update GitHub)"
+    # Sudah versi terbaru
+    VERSION_INFO="Versi Script : ${LOCAL_VER}  (Sudah versi terbaru)"
+    UPDATE_LABEL=""
 fi
 
 clear
@@ -99,7 +100,7 @@ echo -e "  ${RB}♦️${NC} ${YB}RAM           : $uram MB / $tram MB ${NC}"
 echo -e "  ${RB}♦️${NC} ${YB}DOMAIN        : $domain ${NC}"
 echo -e "  ${RB}♦️${NC} ${YB}IP VPS        : $IPVPS ${NC}"
 echo -e "  ${RB}♦️${NC} ${YB}Bandwidth     : Daily: ${daily_usage:-N/A} / Monthly: ${monthly_usage:-N/A}${NC}"
-echo -e "  ${RB}♦️${NC} ${YB}${UPDATE_INFO}${NC}"
+echo -e "  ${RB}♦️${NC} ${YB}${VERSION_INFO}${NC}"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
 echo -e "                      ${WB}⚙️  Menu XRAYS  ⚙️${NC}"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
@@ -175,8 +176,8 @@ case $menu in
       chmod +x /root/update.sh
       bash /root/update.sh
 
-      # Setelah update, sinkron versi lokal dengan versi GitHub
-      NEW_VER=$(curl -fsSL "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/ver" 2>/dev/null | head -n1 | tr -d '\r')
+      # Setelah update, sinkronkan versi lokal dengan versi di GitHub (pakai version_check_v2)
+      NEW_VER=$(curl -fsSL "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/version_check_v2" 2>/dev/null | head -n1 | tr -d '\r')
       if [[ -n "$NEW_VER" ]]; then
           echo "$NEW_VER" > /home/ver
       fi
