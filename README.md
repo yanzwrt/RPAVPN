@@ -1,81 +1,157 @@
-<!DOCTYPE html>
-<h2 align="center">
- XRAY Multiport Websocket By RakhaVPN
-<br> Support CustomPath / worryfree ( Vmess Only)
-<br> Ready for SNI + wildcard domain usage across VMESS/VLESS/Trojan/SSH Websocket
-  
-<h2 align="center"> ♦️Supported Linux Distribution♦️</h2>
-<p align="center"><img src="https://d33wubrfki0l68.cloudfront.net/5911c43be3b1da526ed609e9c55783d9d0f6b066/9858b/assets/img/debian-ubuntu-hover.png"width="400"></p>
-<p align="center"><img src="https://img.shields.io/static/v1?style=for-the-badge&logo=debian&label=Debian%2010 / 11 &message=Buster / bullseye&color=red"> <img src="https://img.shields.io/static/v1?style=for-the-badge&logo=ubuntu&label=Ubuntu%2018.04&message=LTS&color=orange"></p>
-  
-<p align="center"><img src="https://img.shields.io/badge/Service-Multiport (XRAY)-white"></p>
+<!-- BANNER -->
+<p align="center">
+  <img src="https://img.shields.io/badge/RakhaVPN-XRAY%20Multiprotocol-blue?style=for-the-badge&logo=cloudflare&logoColor=white">
+</p>
 
-## ⚠️ HARAP DIBACA ⚠️
-<b>
+<h1 align="center">🚀 XRAY Multiport Websocket Autoscript</h1>
+<h3 align="center">⚡ Support WS • SNI • CustomPath • SSH Websocket • L2TP • XTLS • Trojan • IPv6 Mode ⚡</h3>
 
-1. Your SSL/TLS encryption mode is Full
-2. Enable SSL/TLS Recommender ✅
-3. Edge Certificates > Disable Always Use HTTPS (off)
+<p align="center">
+  <img src="https://img.shields.io/github/v/release/yanzwrt/RPAVPN?style=for-the-badge&color=green">
+  <img src="https://img.shields.io/github/last-commit/yanzwrt/RPAVPN?style=for-the-badge&logo=github&color=purple">
+  <img src="https://img.shields.io/badge/Maintained-YES-blue?style=for-the-badge">
+</p>
 
-<br>
-</b>
-</b>
+<p align="center">
+  <img src="https://img.shields.io/badge/Debian-10/11/12-red?style=for-the-badge&logo=debian">
+  <img src="https://img.shields.io/badge/Ubuntu-18.04/20.04-orange?style=for-the-badge&logo=ubuntu">
+</p>
 
-♦️ untuk Debian 11 / 12 Untuk Instalasi Pertama Kali (Update Repo) <br>
- 
-  ```html
- apt update -y && apt upgrade -y && apt dist-upgrade -y && reboot
-  ```
-  ♦️ unuk Ubuntu 20.04 Untuk Instalasi Pertama Kali (Update Repo) <br>
-  
-  ```html
- apt-get update && apt-get upgrade -y && apt dist-upgrade -y && update-grub && reboot
- ```
-♦️ Installation ( Xray-core Custom ) Link<br>
+---
 
-  ```html
-sysctl -w net.ipv6.conf.all.disable_ipv6=1 && sysctl -w net.ipv6.conf.default.disable_ipv6=1 && apt update && apt install -y bzip2 gzip coreutils screen curl && wget https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/setup.sh && chmod +x setup.sh && ./setup.sh
-  ```
-♦️ Installation ( Xray-core Custom + IPV6 on ) Link<br>
+# ⚠️ **WAJIB DIBACA SEBELUM INSTALASI**
 
-  ```html
-apt update && apt install -y bzip2 gzip coreutils screen curl && wget https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/setup2.sh && chmod +x setup2.sh && ./setup2.sh
-  ```
+Jika menggunakan **Cloudflare**, wajib aktifkan/ubah:
 
-♦️ Update ke versi terbaru dari repo ini<br>
+| Pengaturan | Status |
+|-----------|--------|
+| SSL/TLS Mode | **Full** |
+| Universal SSL | **ON** |
+| Always Use HTTPS | **OFF** |
+| TLS Recommender | **ON** |
+| Edge Certificates | aktif |
 
-  ```bash
-curl -fsSL https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/update.sh -o update.sh && bash update.sh
-  ```
-<b>
+Script mendukung:  
+✔ CDN Cloudflare  
+✔ Direct DNS  
+✔ Wildcard domain  
+✔ SNI Bug Host  
 
-## ⏩ XRAY MULTIPORT WEBSOCKET AUTOSCRIPT DETAILS ⏪
-<b>
-[ XRAY SERVICES ] <br>
-<br>
-♦️ XRAY VMESS WEBSOCKET TLS & NON-TLS 443/80 (support SNI & wildcard)<br>
-♦️ XRAY VMESS WEBSOCKET TLS & NON-TLS 443/80 (SUPPORT CUSTOMPATH /WORRYFREE & SNI)<br>
-♦️ XRAY TROJAN WEBSOCKET TLS & NON-TLS 443/80 (support SNI & wildcard)<br>
-♦️ XRAY VLESS WEBSOCKET TLS & NON-TLS 443/80 (support SNI & wildcard)<br>
-♦️ XRAY TROJAN TCP XTLS 443<br>
-♦️ XRAY TROJAN TCP TLS 443<br>
-♦️ SSH Websocket + Dropbear + Stunnel (SNI friendly payload)<br>
-♦️ L2TP/IPsec server (pre-shared key + user/password)<br>
-<br>
-[ OTHER SERVICES ] <br>
-<br>
+---
 
-♦️ SUPPORT CUSTOM PATH / MULTIPATH <br>
-♦️ XRAY-CORE CHANGER LATEST <br>
-♦️ NEW UPDATE BBRPLUS 5.15.96 <br>
-♦️ BANDWITH MONITOR <br>
-♦️ RAM & CPU MONITOR <br>
-♦️ YAML LINK <br>
-♦️ DNS CHANGER <br>
-♦️ NETFLIX REGION CHECKER <br>
-♦️ CHECK LOGIN USER <br>
-♦️ CHECK CREATED CONFIG <br>
-♦️ AUTOMATIC CLEAR LOG <br>
-♦️ AUTOMATIC VPS AUTOREBOOT 06.00 GMT+8 <br>
-♦️ AUTOMATIC DELETE EXPIRED ACCOUNT <br>
-♦️ AUTOMATIC BACKUP & RESTORE <br></br>
+# 🧰 **FITUR LENGKAP AUTOSCRIPT**
+
+### 🟦 **XRAY Services**
+| Protocol | TLS | Non TLS | WS | XTLS | TCP | SNI | CustomPath |
+|---------|:---:|:-------:|:--:|:----:|:---:|:---:|:-----------:|
+| VMESS | ✔ | ✔ | ✔ | – | – | ✔ | ✔ |
+| VLESS | ✔ | ✔ | ✔ | – | – | ✔ | ✔ |
+| TROJAN WS | ✔ | ✔ | ✔ | – | – | ✔ | ✔ |
+| TROJAN TCP | ✔ | – | – | – | ✔ | ✔ | – |
+| TROJAN XTLS | ✔ | – | – | ✔ | ✔ | ✔ | – |
+
+---
+
+### 🟩 **SSH & VPN Services**
+(Full version only — setup.sh)
+
+| Service | Status |
+|--------|--------|
+| SSH Websocket (WS + Dropbear) | ✔ |
+| Stunnel / OpenSSH | ✔ |
+| L2TP/IPsec (PSK + UserPass) | ✔ |
+
+---
+
+### 🟨 **Fitur Tambahan**
+✔ YAML Generator  
+✔ Auto Delete Expired XRAY (xp.sh)  
+✔ Auto Backup & Restore  
+✔ Auto Clear Log  
+✔ Auto Reboot 03.00 WIB  
+✔ XRAY-Core Changer  
+✔ Multipath Support  
+✔ BBRPLUS Kernel Optimizer  
+✔ Network speedtest  
+✔ DNS Changer  
+✔ Netflix Region Checker  
+✔ Bandwidth Monitor (vnstat)  
+✔ CPU & RAM Monitor  
+
+---
+
+# 📦 **PREMIUM INSTALLATION**
+
+## 🅰️ **Full Version (Rekomendasi) – IPv6 OFF**
+Termasuk SSH-WS, L2TP, XRAY lengkap.
+
+```bash
+sysctl -w net.ipv6.conf.all.disable_ipv6=1 \
+&& sysctl -w net.ipv6.conf.default.disable_ipv6=1 \
+&& apt update \
+&& apt install -y bzip2 gzip coreutils screen curl \
+&& wget https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/setup.sh \
+&& chmod +x setup.sh \
+&& ./setup.sh
+🅱️ Lite Version – IPv6 ON
+XRAY only (WS + SNI). Tanpa SSH & L2TP. Lebih ringan untuk VPS kecil.
+
+bash
+Salin kode
+apt update \
+&& apt install -y bzip2 gzip coreutils screen curl \
+&& wget https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/setup2.sh \
+&& chmod +x setup2.sh \
+&& ./setup2.sh
+🔄 Update Script (Auto Pull from GitHub)
+bash
+Salin kode
+curl -fsSL https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/update.sh -o update.sh \
+&& bash update.sh
+🧪 Detail Port & Struktur XRAY
+Layanan	Port Public	Port Internal
+VMESS WS TLS	443	1311
+VMESS WS NTLS	80 / 8080 / 8880	23456
+VLESS WS TLS	443	1312
+VLESS WS NTLS	80	14016
+TROJAN WS TLS	443	1313
+TROJAN WS NTLS	80	25432
+TROJAN TCP XTLS	443	–
+TROJAN TCP TLS	443	1310
+
+📁 Struktur Auto-Clean (xp.sh)
+Akun yang expired otomatis dihapus dari:
+
+config.json
+
+none.json
+
+vless.json
+
+vnone.json
+
+trojanws.json
+
+trnone.json
+
+trojan.json
+
+xtrojan.json
+
+YAML user file
+
+🎯 Kelebihan Script Ini
+✔ Stabil dipakai ribuan user
+✔ Full auto maintenance
+✔ Tidak berat seperti script lain
+✔ Clean proxy structure
+✔ Sangat cocok untuk provider bug / SNI
+✔ Tidak bentrok port & service
+✔ Full systemd multi-instance
+
+📞 Developer
+RakhaVPN
+Autoscript by: yanzwrt / RakhaVPN Project
+
+Support fork & modifikasi pribadi.
+Dilarang menjual tanpa izin.
