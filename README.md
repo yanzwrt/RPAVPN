@@ -156,14 +156,15 @@ Script secara otomatis:
 
 ### 🥇 KELEBIHAN SCRIPT INI
 
-✔ Stabil dan Ringan  
+✔ stabil dan Ringan  
 ✔ Multi-port + multipath  
 ✔ Full CDN support  
 ✔ SNI friendly  
 ✔ Tidak bentrok port  
 ✔ Clean log + auto maintenance  
 ✔ Struktur JSON ringan  
-✔ **Cocok untuk panel reseller** 
+✔ Cocok untuk panel reseller  
+
 ---
 
 ### 👨‍💻 DEVELOPER
