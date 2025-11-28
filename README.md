@@ -21,7 +21,19 @@
 
 # ⚠️ WAJIB DIPERHATIKAN SEBELUM INSTALL
 
-Jika memakai **Cloudflare CDN**, WAJIB atur:
+## ♦️ untuk debian 10/11/12 saat pertama install (Update Repo) <br>
+ 
+  ```html
+ apt update -y && apt upgrade -y && apt dist-upgrade -y && reboot
+  ```
+
+## ♦️ untuk ubuntu 18/20/22 saat pertama install (Update Repo) <br>
+  
+  ```html
+ apt-get update && apt-get upgrade -y && apt dist-upgrade -y && update-grub && reboot
+ ```
+
+## Jika memakai **Cloudflare CDN**, WAJIB atur:
 
 | Pengaturan | Status |
 |-----------|--------|
@@ -85,18 +97,6 @@ Mendukung:
 ---
 
 # 📦 INSTALASI SCRIPT
-
-️ ## ♦️ untuk debian 10/11/12 saat pertama install (Update Repo) <br>
- 
-  ```html
- apt update -y && apt upgrade -y && apt dist-upgrade -y && reboot
-  ```
-
-## ♦️ untuk ubuntu 18/20/22 saat pertama install (Update Repo) <br>
-  
-  ```html
- apt-get update && apt-get upgrade -y && apt dist-upgrade -y && update-grub && reboot
- ```
 
 ## 🅰️ FULL VERSION (Rekomendasi) — IPv6 OFF  
 Termasuk SSH WS + L2TP + XRAY lengkap.
