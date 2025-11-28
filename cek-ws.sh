@@ -1,68 +1,69 @@
 #!/bin/bash
 # =========================================
 # Quick Setup | Script Setup Manager
-# Edition : Stable Edition V1.0
-# Author  : RakhaVPN (mod RPAVPN)
+# Edition : Stable Edition V1.1
+# Author  : RakhaVPN
 # (C) Copyright 2025
 # =========================================
 
-clear
-
 red='\e[1;31m'
 green='\e[0;32m'
-orange='\e[1;33m'
-CYAN='\e[0;36m'
+yellow='\e[0;33m'
 NC='\e[0m'
 
-# kosongkan file temp (kalau mau dipakai)
-> /tmp/other.txt
+LOG_FILE="/var/log/xray/access.log"
 
-# ambil list user vmess dari config xray
-data=( $(grep '^###' /usr/local/etc/xray/config.json | awk '{print $2}' | sort -u) )
-
+clear
 echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-echo -e " \E[0;47;30m     Pengguna Login XRAY VMESS WS     \E[0m"
+echo -e "\\E[0;47;30m   Pengguna Login XRAY VMESS WS   \E[0m"
 echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 
-# pastikan log ada
-if [[ ! -f /var/log/xray/access.log ]]; then
-    echo -e "${red}Log /var/log/xray/access.log tidak ditemukan.${NC}"
-    echo ""
-    read -p "$( echo -e "Press ${orange}[ ${NC}${green}Enter${NC} ${CYAN}]${NC} kembali ke menu . . .") "
-    menu
+if [[ ! -f "$LOG_FILE" ]]; then
+  echo -e " ${red}Log tidak ditemukan: $LOG_FILE${NC}"
+  echo ""
+  read -n1 -s -r -p "Press [ Enter ] kembali ke menu . . . "
+  menu
+  exit 0
 fi
 
-for akun in "${data[@]}"; do
-    [[ -z "$akun" ]] && continue
+# Ambil list user dari log berdasarkan field email:
+mapfile -t online_users < <(grep -a "email:" "$LOG_FILE" 2>/dev/null \
+  | awk -F'email: ' 'NF>1 {print $2}' \
+  | awk '{print $1}' \
+  | sort -u)
 
-    > /tmp/ipvmess.txt
+if [[ ${#online_users[@]} -eq 0 ]]; then
+  echo -e " ${yellow}Belum ada user VMESS WS yang tercatat login.${NC}"
+  echo ""
+  read -n1 -s -r -p "Press [ Enter ] kembali ke menu . . . "
+  menu
+  exit 0
+fi
 
-    # ambil IP unik dari log VMESS
-    data2=( $(tail -n 500 /var/log/xray/access.log | awk '{print $3}' | sed 's/tcp://g' | cut -d ":" -f 1 | sort -u) )
+printf " %-3s %-15s %-8s %-40s\n" "No" "User" "Login" "IP Terakhir"
+echo -e "-----------------------------------------------"
 
-    for ip in "${data2[@]}"; do
-        # cek apakah IP ini dipakai user $akun
-        jum=$(grep -w "$akun" /var/log/xray/access.log | tail -n 500 | \
-              awk '{print $3}' | sed 's/tcp://g' | cut -d ":" -f 1 | grep -w "$ip" | sort -u)
+no=1
+for user in "${online_users[@]}"; do
+  # Hitung jumlah baris (koneksi) untuk user ini
+  count=$(grep -a "email: ${user}" "$LOG_FILE" 2>/dev/null | wc -l)
 
-        if [[ "$jum" == "$ip" ]]; then
-            echo "$jum" >> /tmp/ipvmess.txt
-        else
-            echo "$ip" >> /tmp/other.txt
-        fi
-    done
+  # Ambil IP terakhir yang dipakai user (field ke-3: IP:port)
+  last_ip=$(grep -a "email: ${user}" "$LOG_FILE" 2>/dev/null \
+    | awk '{print $3}' \
+    | cut -d: -f1 \
+    | tail -n1)
 
-    if [[ -s /tmp/ipvmess.txt ]]; then
-        echo "User : $akun"
-        nl -ba /tmp/ipvmess.txt
-        echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-    fi
+  [[ -z "$last_ip" ]] && last_ip="-"
 
-    rm -f /tmp/ipvmess.txt
+  printf " %-3s %-15s %-8s %-40s\n" "$no" "$user" "$count" "$last_ip"
+  ((no++))
 done
 
-rm -f /tmp/other.txt
-
 echo ""
-read -p "$( echo -e "Press ${orange}[ ${NC}${green}Enter${NC} ${CYAN}]${NC} kembali ke menu . . .") "
+echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo -e " ${green}Selesai menampilkan login XRAY VMESS WS.${NC}"
+echo ""
+read -n1 -s -r -p "Press [ Enter ] kembali ke menu . . . "
 menu
+
