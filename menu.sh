@@ -19,6 +19,10 @@ MB='\e[35;1m'
 CB='\e[35;1m'
 WB='\e[37;1m'
 
+# ==========================
+#  INFO SERVER & AKUN
+# ==========================
+
 # CPU usage (pakai top biar simpel)
 load_cpu=$(printf '%-3s' "$(top -bn1 | awk '/Cpu/ { cpu = 100 - $8; printf("%.0f%%", cpu) }')")
 
@@ -54,30 +58,51 @@ fi
 daily_usage=$(vnstat -d --oneline 2>/dev/null | awk -F\; '{print $6}' | sed 's/ //')
 monthly_usage=$(vnstat -m --oneline 2>/dev/null | awk -F\; '{print $11}' | sed 's/ //')
 
+# ==========================
+#  CEK VERSI SCRIPT & UPDATE
+# ==========================
+
+LOCAL_VER="-"
+if [[ -f /home/ver ]]; then
+    LOCAL_VER=$(head -n1 /home/ver 2>/dev/null | tr -d '\r')
+fi
+
+REMOTE_VER=$(curl -fsSL "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/ver" 2>/dev/null | head -n1 | tr -d '\r')
+
+UPDATE_LABEL=""
+VERSION_INFO="Versi Script : ${LOCAL_VER}"
+
+if [[ -n "$REMOTE_VER" && "$REMOTE_VER" != "$LOCAL_VER" ]]; then
+    # Ada versi baru
+    UPDATE_LABEL=" ${RB}[UPDATE v${REMOTE_VER}]${NC}"
+    VERSION_INFO="Versi Script : ${LOCAL_VER}  (Update tersedia ➜ v${REMOTE_VER})"
+fi
+
 clear
 echo -e "${BB}╔════════════════════════════════════════════════════════════╗${NC}"
 echo -e "            ${WB}🧩 Multiport Websocket Autoscript by Rakha 🧩${NC}"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
 echo -e "                   ${WB}🖥️  Informasi Server 🖥️${NC}                 "
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
-echo -e "  ${RB}♦️${NC} ${YB}SISTEM    : $(hostnamectl | grep 'Operating System' | cut -d ' ' -f5-) ${NC}"
-echo -e "  ${RB}♦️${NC} ${YB}KERNEL    : $(uname -r) ${NC}"
-echo -e "  ${RB}♦️${NC} ${YB}UPTIME    : $uptime ${NC}"
-echo -e "  ${RB}♦️${NC} ${YB}CPU       : $load_cpu ${NC}"
-echo -e "  ${RB}♦️${NC} ${YB}RAM       : $uram MB / $tram MB ${NC}"
-echo -e "  ${RB}♦️${NC} ${YB}DOMAIN    : $domain ${NC}"
-echo -e "  ${RB}♦️${NC} ${YB}IP VPS    : $IPVPS ${NC}"
-echo -e "  ${RB}♦️${NC} ${YB}Bandwidth : Daily: ${daily_usage:-N/A} / Monthly: ${monthly_usage:-N/A}${NC}"
+echo -e "  ${RB}♦️${NC} ${YB}SISTEM        : $(hostnamectl | grep 'Operating System' | cut -d ' ' -f5-) ${NC}"
+echo -e "  ${RB}♦️${NC} ${YB}KERNEL        : $(uname -r) ${NC}"
+echo -e "  ${RB}♦️${NC} ${YB}UPTIME        : $uptime ${NC}"
+echo -e "  ${RB}♦️${NC} ${YB}CPU           : $load_cpu ${NC}"
+echo -e "  ${RB}♦️${NC} ${YB}RAM           : $uram MB / $tram MB ${NC}"
+echo -e "  ${RB}♦️${NC} ${YB}DOMAIN        : $domain ${NC}"
+echo -e "  ${RB}♦️${NC} ${YB}IP VPS        : $IPVPS ${NC}"
+echo -e "  ${RB}♦️${NC} ${YB}Bandwidth     : Daily: ${daily_usage:-N/A} / Monthly: ${monthly_usage:-N/A}${NC}"
+echo -e "  ${RB}♦️${NC} ${YB}${VERSION_INFO}${NC}"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
 echo -e "                      ${WB}⚙️  Menu XRAYS  ⚙️${NC}"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
-echo -e "  ${RB}01.${NC} ${YB}XRAY VMESS WS     ${WB}[${GB}${vmess}${WB}]${NC} 🌀"
-echo -e "  ${RB}02.${NC} ${YB}XRAY VLESS WS     ${WB}[${GB}${vless}${WB}]${NC} 📡"
-echo -e "  ${RB}03.${NC} ${YB}XRAY TROJAN WS    ${WB}[${GB}${trws}${WB}]${NC} 🛡️"
-echo -e "  ${RB}04.${NC} ${YB}XRAY TROJAN XTLS  ${WB}[${GB}${txtls}${WB}]${NC} 🔐"
-echo -e "  ${RB}05.${NC} ${YB}XRAY TROJAN TCP   ${WB}[${GB}${tr}${WB}]${NC} 🧰"
-echo -e "  ${RB}06.${NC} ${YB}MENU SSH & WEBSOCKET ${WB}[${GB}${ssh_count}${WB}]${NC} 🔑"
-echo -e "  ${RB}07.${NC} ${YB}MENU L2TP / IPSEC    ${WB}[${GB}${l2tp_count}${WB}]${NC} 🌐"
+echo -e "  ${RB}01.${NC} ${YB}XRAY VMESS WS         ${WB}[${GB}${vmess}${WB}]${NC} 🌀"
+echo -e "  ${RB}02.${NC} ${YB}XRAY VLESS WS         ${WB}[${GB}${vless}${WB}]${NC} 📡"
+echo -e "  ${RB}03.${NC} ${YB}XRAY TROJAN WS        ${WB}[${GB}${trws}${WB}]${NC} 🛡️"
+echo -e "  ${RB}04.${NC} ${YB}XRAY TROJAN XTLS      ${WB}[${GB}${txtls}${WB}]${NC} 🔐"
+echo -e "  ${RB}05.${NC} ${YB}XRAY TROJAN TCP       ${WB}[${GB}${tr}${WB}]${NC} 🧰"
+echo -e "  ${RB}06.${NC} ${YB}MENU SSH & WEBSOCKET  ${WB}[${GB}${ssh_count}${WB}]${NC} 🔑"
+echo -e "  ${RB}07.${NC} ${YB}MENU L2TP / IPSEC     ${WB}[${GB}${l2tp_count}${WB}]${NC} 🌐"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
 echo -e "                      ${WB}🛠️  Menu VPS  🛠️${NC}"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
@@ -102,7 +127,7 @@ echo -e "  ${RB}25.${NC} ${YB}MENU XRAY-CORE                      🧪"
 echo -e "  ${RB}26.${NC} ${YB}MENU SWAP RAM                       💿"
 echo -e "  ${RB}27.${NC} ${YB}BERSIHKAN LOG                       🧽"
 echo -e "  ${RB}28.${NC} ${YB}TAMPILKAN INFO SYSTEM (NEOFETCH)    ❌"
-echo -e "  ${RB}29.${NC} ${YB}UPDATE SCRIPT DARI GITHUB           ⬆️"
+echo -e "  ${RB}29.${NC} ${YB}UPDATE SCRIPT DARI GITHUB${UPDATE_LABEL}           ⬆️"
 echo -e "${BB}╠════════════════════════════════════════════════════════════╣${NC}"
 echo ""
 read -p "📌 Pilih Menu [ 1 - 29 ] : " menu
@@ -137,12 +162,19 @@ case $menu in
  27)  clear; cleaner ;;
  28)  clear; neofetch ;;
  29)
-      29)
       clear
-      echo "🔄 Menjalankan update dari GitHub..."
-      curl -fsSL https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/update.sh -o /root/update.sh
+      echo "🔄 Mengunduh & menjalankan update dari GitHub..."
+      curl -fsSL "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/update.sh" -o /root/update.sh
       chmod +x /root/update.sh
       bash /root/update.sh
+
+      # Setelah update, sinkronkan versi lokal dengan versi di GitHub (jika ada)
+      NEW_VER=$(curl -fsSL "https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/ver" 2>/dev/null | head -n1 | tr -d '\r')
+      if [[ -n "$NEW_VER" ]]; then
+          echo "$NEW_VER" > /home/ver
+      fi
+
+      echo ""
       read -n1 -r -p "Tekan Enter untuk kembali ke menu..."
       menu
       ;;
