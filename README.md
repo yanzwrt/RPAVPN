@@ -41,9 +41,9 @@
 | Universal SSL | **ON** |
 | Always Use HTTPS | **OFF** |
 | TLS Recommender | **ON** |
-| Edge Certificates | Aktif |
-
-Mendukung:
+| Edge Certificates | Aktif |  
+---
+Mendukung:  
 ✔ Bug Host / SNI  
 ✔ Wildcard Domain  
 ✔ Cloudflare Proxy / DNS Only  
