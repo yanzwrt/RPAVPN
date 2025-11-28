@@ -93,16 +93,19 @@ sysctl -w net.ipv6.conf.all.disable_ipv6=1 \
 && wget https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/setup.sh \
 && chmod +x setup.sh \
 && ./setup.sh
-🅱️ Lite Version – IPv6 ON
+
+
+##🅱️ Lite Version – IPv6 ON
 XRAY only (WS + SNI). Tanpa SSH & L2TP. Lebih ringan untuk VPS kecil.
 
-bash
-Salin kode
+  ```html
 apt update \
 && apt install -y bzip2 gzip coreutils screen curl \
 && wget https://raw.githubusercontent.com/yanzwrt/RPAVPN/main/setup2.sh \
 && chmod +x setup2.sh \
 && ./setup2.sh
+
+
 🔄 Update Script (Auto Pull from GitHub)
 bash
 Salin kode
