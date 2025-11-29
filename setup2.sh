@@ -1,5 +1,3 @@
-
-```bash
 #!/bin/bash
 # =========================================
 # Penyiapan Cepat | Manajer Setup Skrip
