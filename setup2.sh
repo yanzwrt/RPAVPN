@@ -3,7 +3,7 @@
 #!/bin/bash
 # =========================================
 # Penyiapan Cepat | Manajer Setup Skrip
-# Edisi  : Edisi Stabil V1.0
+# Edisi  : Edisi Stabil V1.1
 # Pembuat: RakhaVPN
 # (C) Hak Cipta 2025
 # =========================================
