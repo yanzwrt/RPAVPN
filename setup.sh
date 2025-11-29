@@ -1,7 +1,7 @@
 #!/bin/bash
 # =========================================
 # Quick Setup | Script Setup Manager
-# Edition : Stable Edition V1.0
+# Edition : Stable Edition V1.1
 # Author  : yanzwrt
 # (C) Copyright 2025
 # =========================================
@@ -61,6 +61,36 @@ echo -e "[ ${green}INFO${NC} ] Mempersiapkan instalasi autoscript ~"
 apt install git curl -y >/dev/null 2>&1
 echo -e "[ ${green}INFO${NC} ] File instalasi siap untuk dimulai!"
 sleep 1
+
+# =========================================
+# ENABLE IP FORWARD + IPTABLES UNTUK VPN
+# =========================================
+echo -e "[ ${green}INFO${NC} ] Mengaktifkan IPv4 forwarding..."
+sed -i 's/^#\?net.ipv4.ip_forward=.*/net.ipv4.ip_forward=1/' /etc/sysctl.conf
+sysctl -p >/dev/null 2>&1
+
+# Deteksi interface publik (eth0 / ens3 / ens18, dll)
+WAN_IF=$(ip route show default 2>/dev/null | awk '{print $5}' | head -n1)
+if [ -z "$WAN_IF" ]; then
+  WAN_IF="eth0"
+fi
+echo -e "[ ${green}INFO${NC} ] Interface publik terdeteksi: ${WAN_IF}"
+
+echo -e "[ ${green}INFO${NC} ] Mengatur iptables NAT & FORWARD untuk klien VPN (ppp+/L2TP)..."
+
+# NAT semua trafik keluar via interface publik
+iptables -t nat -A POSTROUTING -o "${WAN_IF}" -j MASQUERADE
+
+# Izinkan trafik dari klien L2TP/PPP (ppp+) ke internet
+iptables -A FORWARD -i ppp+ -o "${WAN_IF}" -j ACCEPT
+
+# Izinkan trafik balik dari internet ke klien L2TP/PPP
+iptables -A FORWARD -i "${WAN_IF}" -o ppp+ -m state --state RELATED,ESTABLISHED -j ACCEPT
+
+# Install & simpan iptables-persistent agar rules tidak hilang saat reboot
+apt-get install -y iptables-persistent >/dev/null 2>&1
+netfilter-persistent save >/dev/null 2>&1
+echo -e "[ ${green}INFO${NC} ] Aturan iptables tersimpan (iptables-persistent)."
 
 # Cek apakah sudah pernah diinstall (pakai config Xray & domain)
 if [ -f "/usr/local/etc/xray/config.json" ] && [ -f "/root/domain" ]; then
